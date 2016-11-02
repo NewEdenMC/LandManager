@@ -1,0 +1,7 @@
+name: LandManager
+main: co.neweden.LandManager.Main
+author: AaronMcH
+description: Manages land claims, and block and entity protections
+website: https://neweden.co/
+version: 0.1-SNAPSHOT
+depend: [MenuGUI]
