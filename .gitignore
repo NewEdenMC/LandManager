@@ -40,4 +40,3 @@ export.jardesc
 .idea
 *.iml
 /target/
-/.idea/
