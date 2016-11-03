@@ -5,3 +5,15 @@ description: Manages land claims, and block and entity protections
 website: https://neweden.co/
 version: 0.1-SNAPSHOT
 depend: [MenuGUI]
+commands:
+   claim:
+      description: Claim the chunk the player is standing in, either as a new claim or for an existing one
+      permission: landmanager.claim
+permissions:
+   landmanager.*:
+      description: Gives all LandManager permission nodes
+      default: op
+      children:
+         perks.claim: true
+   landmanager.claim:
+      description: Permission to use /claim command
