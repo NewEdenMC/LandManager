@@ -12,7 +12,7 @@ import java.util.logging.Level;
 public class LandClaim {
 
     private int id;
-    protected String displayName = "";
+    protected String displayName;
     protected UUID owner;
     protected Location homeLocation;
     protected Material iconMaterial = Material.GRASS;
@@ -22,7 +22,7 @@ public class LandClaim {
     }
 
     public String getDisplayName() {
-        if (displayName.equals(""))
+        if (displayName == null)
             return "Land Claim #" + id;
         else
             return displayName;
