@@ -28,6 +28,8 @@ public class LandClaim {
             return displayName;
     }
 
+    public int getID() { return id; }
+
     public UUID getOwner() { return owner; }
 
     public Location getHomeLocation() { return homeLocation; }
