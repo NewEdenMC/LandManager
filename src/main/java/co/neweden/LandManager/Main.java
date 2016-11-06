@@ -99,7 +99,7 @@ public class Main extends JavaPlugin {
                 }
                 claim.homeLocation = homeLocation;
 
-                LandManager.landClaims.add(claim);
+                LandManager.landClaims.put(land_id, claim);
             }
         } catch (SQLException e) {
             getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to load Land Claims from the Database.", e);
