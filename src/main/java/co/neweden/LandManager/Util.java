@@ -4,9 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.DoubleChest;
 
-import java.text.NumberFormat;
 import java.util.logging.Level;
 
 public class Util {

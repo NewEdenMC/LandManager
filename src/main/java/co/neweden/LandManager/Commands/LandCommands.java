@@ -1,4 +1,4 @@
-package co.neweden.LandManager.commands;
+package co.neweden.LandManager.Commands;
 
 import co.neweden.LandManager.LandClaim;
 import co.neweden.LandManager.LandManager;
@@ -10,12 +10,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.logging.Level;
 
 public class LandCommands implements CommandExecutor {
 

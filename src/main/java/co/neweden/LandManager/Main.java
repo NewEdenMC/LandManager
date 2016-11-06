@@ -1,6 +1,6 @@
 package co.neweden.LandManager;
 
-import co.neweden.LandManager.commands.LandCommands;
+import co.neweden.LandManager.Commands.LandCommands;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 
