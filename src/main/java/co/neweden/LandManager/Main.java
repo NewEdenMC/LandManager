@@ -16,6 +16,7 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         LandManager.plugin = this;
         new LandCommands();
+        getServer().getPluginManager().registerEvents(new EventsListener(), this);
         startup();
     }
 
