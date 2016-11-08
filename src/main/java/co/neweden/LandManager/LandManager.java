@@ -19,20 +19,23 @@ public class LandManager {
 
     public static LandClaim getLandClaim(int landID) { return landClaims.get(landID); }
 
-    public static boolean isChunkClaimed(Chunk chunk) {
+    public static LandClaim getLandClaim(Chunk chunk) {
         try {
-            PreparedStatement st = LandManager.db.prepareStatement("SELECT chunk_id FROM chunks WHERE world=? AND x=? AND z=?;");
+            PreparedStatement st = LandManager.db.prepareStatement("SELECT land_id FROM chunks WHERE world=? AND x=? AND z=?;");
             st.setString(1, chunk.getWorld().getName());
             st.setInt(2, chunk.getX());
             st.setInt(3, chunk.getZ());
             ResultSet rs = st.executeQuery();
             if (rs.next())
-                return true;
+                return landClaims.get(rs.getInt("land_id"));
         } catch (SQLException e) {
-            getPlugin().getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to get claimed chunk information.", e);
-            return false;
+            getPlugin().getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to get chunk information.", e);
         }
-        return false;
+        return null;
+    }
+
+    public static boolean isChunkClaimed(Chunk chunk) {
+        return (getLandClaim(chunk) != null);
     }
 
     public static LandClaim createClaim(UUID owner, Location homeLocation) {
