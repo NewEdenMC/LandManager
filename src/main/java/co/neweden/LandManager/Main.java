@@ -1,6 +1,7 @@
 package co.neweden.LandManager;
 
 import co.neweden.LandManager.Commands.LandCommands;
+import co.neweden.LandManager.Listeners.LocationEvents;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -16,7 +17,7 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         LandManager.plugin = this;
         new LandCommands();
-        getServer().getPluginManager().registerEvents(new EventsListener(), this);
+        getServer().getPluginManager().registerEvents(new LocationEvents(), this);
         startup();
     }
 

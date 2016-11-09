@@ -1,13 +1,16 @@
-package co.neweden.LandManager;
+package co.neweden.LandManager.Listeners;
 
 import co.neweden.LandManager.Events.PlayerEnterLandClaimEvent;
 import co.neweden.LandManager.Events.PlayerExitLandClaimEvent;
+import co.neweden.LandManager.LandClaim;
+import co.neweden.LandManager.LandManager;
+import co.neweden.LandManager.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.event.*;
 import org.bukkit.event.player.*;
 
-public class EventsListener implements Listener {
+public class LocationEvents implements Listener {
 
     private enum EventResponse { NO_ACTION, SUCCESS, CANCELED }
 
