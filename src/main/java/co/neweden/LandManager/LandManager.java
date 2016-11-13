@@ -79,7 +79,7 @@ public class LandManager {
                 LandClaim land = LandManager.getLandClaim(rs.getInt("land_id"));
                 if (land == null) continue;
                 if (uuid != null) {
-                    if (!uuid.equals(land.getOwner())) continue;
+                    if (!land.testAccessLevel(uuid, ACL.Level.MODIFY)) continue;
                 }
                 adjacentLand.add(land);
             }
