@@ -1,5 +1,6 @@
 package co.neweden.LandManager.Listeners;
 
+import co.neweden.LandManager.ACL;
 import co.neweden.LandManager.Events.PlayerEnterLandClaimEvent;
 import co.neweden.LandManager.Events.PlayerExitLandClaimEvent;
 import co.neweden.LandManager.LandClaim;
@@ -41,6 +42,11 @@ public class LocationEvents implements Listener {
 
         if (toLand != null) {
             PlayerEnterLandClaimEvent enterEvent = new PlayerEnterLandClaimEvent(toLand, callingEvent.getPlayer());
+
+            if (!toLand.testAccessLevel(callingEvent.getPlayer().getUniqueId(), ACL.Level.VIEW) && !callingEvent.getPlayer().hasPermission("landmanager.enterany")) {
+                enterEvent.setCancelled(true);
+            }
+
             Bukkit.getServer().getPluginManager().callEvent(enterEvent);
 
             if (enterEvent.isCancelled()) {

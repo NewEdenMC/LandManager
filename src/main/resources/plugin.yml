@@ -17,16 +17,23 @@ permissions:
       description: Gives all LandManager permission nodes
       default: op
       children:
-         landmanager.land: true
-         landmanager.linfo.any: true
+         landmanager.land.moderator: true
    landmanager.land:
-      description: Gives non-admin permissions to claim and use Land
+      description: Gives player permissions to claim and use Land
       children:
          landmanager.claim: true
          landmanager.linfo: true
+   landmanager.land.moderator:
+      description: Gives moderator permissions to manage land
+      children:
+         landmanager.land: true
+         landmanager.enterany: true
+         landmanager.linfo.any: true
    landmanager.claim:
       description: Permission to use /claim command
+   landmanager.enterany:
+      description: Permission to enter any land claim regardless of ACL Level
    landmanager.linfo:
       description: Permission to use /linfo command
    landmanager.linfo.any:
-      description: Permission to use /linfo command on any land claim
+      description: Permission to use /linfo command regardless of ACL Level
