@@ -9,11 +9,24 @@ commands:
    claim:
       description: Claim the chunk the player is standing in, either as a new claim or for an existing one
       permission: landmanager.claim
+   linfo:
+      description: Get information about the Land Claim the player is standing in
+      permission: landmanager.linfo
 permissions:
    landmanager.*:
       description: Gives all LandManager permission nodes
       default: op
       children:
-         perks.claim: true
+         landmanager.land: true
+         landmanager.linfo.any: true
+   landmanager.land:
+      description: Gives non-admin permissions to claim and use Land
+      children:
+         landmanager.claim: true
+         landmanager.linfo: true
    landmanager.claim:
       description: Permission to use /claim command
+   landmanager.linfo:
+      description: Permission to use /linfo command
+   landmanager.linfo.any:
+      description: Permission to use /linfo command on any land claim

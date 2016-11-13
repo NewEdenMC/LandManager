@@ -65,6 +65,13 @@ public class Main extends JavaPlugin {
                     ");\n"
             );
             LandManager.db.createStatement().execute(
+                    "CREATE TABLE IF NOT EXISTS `landclaims_acl` (\n" +
+                    "  `land_id` INT NOT NULL,\n" +
+                    "  `uuid` VARCHAR(36) NOT NULL,\n" +
+                    "  `level` VARCHAR(32) NOT NULL\n" +
+                    ");"
+            );
+            LandManager.db.createStatement().execute(
                     "CREATE TABLE IF NOT EXISTS `chunks` (\n" +
                     "  `chunk_id` INT NOT NULL AUTO_INCREMENT,\n" +
                     "  `land_id` INT NOT NULL,\n" +
@@ -94,6 +101,13 @@ public class Main extends JavaPlugin {
                 } catch (IllegalArgumentException e) {
                     getLogger().log(Level.SEVERE, "Land Claim #" + land_id + ": UUID \"" + rs.getString("owner") + "\" is not valid, Land Claim will not be loaded.");
                     continue;
+                }
+
+                try {
+                    if (rs.getString("everyone_acl_level") != null)
+                        claim.everyoneAccessLevel = ACL.Level.valueOf(rs.getString("everyone_acl_level"));
+                } catch (IllegalArgumentException e) {
+                    getLogger().log(Level.SEVERE, "Land Claim #" + land_id + ": Value \"" + rs.getString("everyone_acl_level") + "\" is not valid, default Level will be used instead.");
                 }
 
                 Location homeLocation = Util.locationFromString(rs.getString("home_location"));
