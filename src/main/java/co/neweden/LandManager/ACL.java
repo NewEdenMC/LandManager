@@ -40,7 +40,7 @@ public abstract class ACL {
     }
 
     public Level getAccessLevel(UUID uuid) {
-        return (list.containsKey(uuid)) ? list.get(uuid) : getEveryoneAccessLevel();
+        return (getACL().containsKey(uuid)) ? getACL().get(uuid) : getEveryoneAccessLevel();
     }
 
     public abstract UUID getOwner();
