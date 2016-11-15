@@ -1,5 +1,7 @@
 package co.neweden.LandManager;
 
+import org.bukkit.entity.Player;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -11,6 +13,13 @@ public abstract class ACL {
     public enum Level { NO_ACCESS, VIEW, INTERACT, MODIFY, FULL_ACCESS }
 
     public boolean testAccessLevel(UUID uuid, Level needed) { return testAccessLevel(getAccessLevel(uuid), needed); }
+
+    public boolean testAccessLevel(Player player, Level needed, String bypassPermission) {
+        if (testAccessLevel(player.getUniqueId(), needed) || player.hasPermission(bypassPermission))
+            return true;
+        else
+            return false;
+    }
 
     public static boolean testAccessLevel(Level hasLevel, Level needed) {
         // Convert "hasLevel" to integers for comparison
