@@ -9,6 +9,10 @@ commands:
    claim:
       description: Claim the chunk the player is standing in, either as a new claim or for an existing one
       permission: landmanager.claim
+   newclaim:
+      description: Claim the chunk the player is standing in as a new claim, regardless of claims around it, optionally specify the name to give to this new claim, spaces are allowed
+      permission: landmanager.claim
+      usage: /newclaim [NAME]
    linfo:
       description: Get information about the Land Claim the player is standing in
       permission: landmanager.linfo

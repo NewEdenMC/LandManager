@@ -20,6 +20,7 @@ public class LandCommands implements CommandExecutor {
 
     public LandCommands() {
         LandManager.getPlugin().getCommand("claim").setExecutor(this);
+        LandManager.getPlugin().getCommand("newclaim").setExecutor(this);
         LandManager.getPlugin().getCommand("linfo").setExecutor(this);
     }
 
@@ -34,6 +35,7 @@ public class LandCommands implements CommandExecutor {
 
         switch (commandLabel.toLowerCase()) {
             case "claim": claimCommand(player, args); break;
+            case "newclaim": newClaimCommand(player, args); break;
             case "linfo": infoCommand(player); break;
             default: end = false;
         }
@@ -58,12 +60,15 @@ public class LandCommands implements CommandExecutor {
             return;
         }
 
+        // Get claims that are directly next to this chunk
+        // Proper access checks performed in the getAdjacentClaims methods
         Collection<LandClaim> nearClaims = LandManager.getAdjacentClaims(player.getLocation().getChunk(), player.getUniqueId());
         if (nearClaims == null) {
             player.sendMessage(Util.formatString("&cAn internal error has occurred while trying to identify land, please contact a staff member."));
             return;
         }
 
+        // if command is run with an argument (which should be the Land ID that the player selected) do this
         if (args.length == 1) {
             int landIDfromArgs;
             try {
@@ -74,7 +79,7 @@ public class LandCommands implements CommandExecutor {
             }
             for (LandClaim land : nearClaims) {
                 if (land.getID() != landIDfromArgs) continue;
-                if (land.claimChunk(player.getLocation().getChunk()))
+                if (land.claimChunk(player.getLocation().getChunk())) // access check already performed
                     player.sendMessage(Util.formatString("&aThis chunk has been claimed and added to the land claim: &e" + land.getDisplayName()));
                 else
                     player.sendMessage(Util.formatString("&cAn internal error has occurred while trying to claim chunk for existing claim, please contact a staff member."));
@@ -84,31 +89,57 @@ public class LandCommands implements CommandExecutor {
             return;
         }
 
+        // If there are no claims nearby do this
         if (nearClaims.size() == 0) {
-            LandClaim claim = LandManager.createClaim(player.getUniqueId(), player.getLocation());
-            if (claim == null) {
-                player.sendMessage(Util.formatString("&cAn internal error has occurred while trying to create a new Land Claim, please contact a staff member."));
-                return;
-            }
-            claim.claimChunk(player.getLocation().getChunk());
-            player.sendMessage(Util.formatString("&aThis chunk has been claimed and a new land claim was setup"));
+            createNewClaim(player, null);
             return;
         }
 
+        // If there is just one claim nearby do this
         if (nearClaims.size() == 1) {
             LandClaim land = nearClaims.iterator().next();
-            if (land.claimChunk(player.getLocation().getChunk()))
+            if (land.claimChunk(player.getLocation().getChunk())) // access check already performed
                 player.sendMessage(Util.formatString("&aThis chunk has been claimed and added to the land claim: &e" + land.getDisplayName()));
             else
                 player.sendMessage(Util.formatString("&cAn internal error has occurred while trying to claim chunk for existing claim, please contact a staff member."));
             return;
         }
 
-        player.sendMessage(Util.formatString("Select which claim you would like to add this chunk to"));
+        // If there are multiple claims nearby do this
+        player.sendMessage(Util.formatString("Multiple adjacent Land Claims found, select which claim you would like to add this chunk to:"));
         for (LandClaim land : nearClaims) {
             player.spigot().sendMessage(new ComponentBuilder(land.getDisplayName()).event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/claim " + land.getID())).create());
         }
+        player.spigot().sendMessage(new ComponentBuilder("Or click here to create a new Land Claim").event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/newclaim")).create());
 
+    }
+
+    private void newClaimCommand(Player player, String[] args) {
+        if (!LandManager.isChunkClaimed(player.getLocation().getChunk()))
+            createNewClaim(player, args);
+        else
+            player.sendMessage(Util.formatString("&cYou can't claim this chunk as it has already been claimed."));
+    }
+
+    private void createNewClaim(Player player, String[] args) {
+        String name = null;
+        if (args != null) {
+            name = "";
+            for (int i = 0; i < args.length; i++) {
+                name += args[i] + " ";
+            }
+            name = name.substring(0, name.length() - 1);
+        }
+
+        LandClaim claim = LandManager.createClaim(player.getUniqueId(), player.getLocation());
+        if (claim == null) {
+            player.sendMessage(Util.formatString("&cAn internal error has occurred while trying to create a new Land Claim, please contact a staff member."));
+            return;
+        }
+        player.sendMessage(name);
+        claim.setDisplayName(name);
+        claim.claimChunk(player.getLocation().getChunk());
+        player.sendMessage(Util.formatString("&aThis chunk has been claimed and a new land claim was setup with the name: &e" + claim.getDisplayName()));
     }
 
     private void infoCommand(Player player) {
