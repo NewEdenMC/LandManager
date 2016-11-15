@@ -64,17 +64,18 @@ public class LandManager {
     public static Collection<LandClaim> getAdjacentClaims(Chunk chunk, UUID uuid) {
         Collection<LandClaim> adjacentLand = new HashSet<>();
         try {
-            PreparedStatement st = LandManager.getDB().prepareStatement("SET @refX=?, @refZ=?;");
-            st.setInt(1, chunk.getX());
-            st.setInt(2, chunk.getX());
-            st.executeUpdate();
-            ResultSet rs = LandManager.getDB().createStatement().executeQuery(
+            PreparedStatement st = LandManager.getDB().prepareStatement(
                     "SELECT * FROM chunks WHERE\n" +
-                            " (x = @refX - 1 AND z = @refZ) OR\n" +
-                            " (x = @refX + 1 AND z = @refZ) OR\n" +
-                            " (x = @refX AND z = @refZ - 1) OR\n" +
-                            " (x = @refX AND z = @refZ + 1);"
+                    " (x = ? - 1 AND z = ?) OR\n" +
+                    " (x = ? + 1 AND z = ?) OR\n" +
+                    " (x = ? AND z = ? - 1) OR\n" +
+                    " (x = ? AND z = ? + 1);"
             );
+            st.setInt(1, chunk.getX()); st.setInt(2, chunk.getZ());
+            st.setInt(3, chunk.getX()); st.setInt(4, chunk.getZ());
+            st.setInt(5, chunk.getX()); st.setInt(6, chunk.getZ());
+            st.setInt(7, chunk.getX()); st.setInt(8, chunk.getZ());
+            ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 LandClaim land = LandManager.getLandClaim(rs.getInt("land_id"));
                 if (land == null) continue;
