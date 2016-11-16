@@ -21,6 +21,7 @@ public class LandCommands implements CommandExecutor {
     public LandCommands() {
         LandManager.getPlugin().getCommand("claim").setExecutor(this);
         LandManager.getPlugin().getCommand("newclaim").setExecutor(this);
+        LandManager.getPlugin().getCommand("unclaim").setExecutor(this);
         LandManager.getPlugin().getCommand("linfo").setExecutor(this);
     }
 
@@ -48,7 +49,7 @@ public class LandCommands implements CommandExecutor {
         }
 
         switch (commandLabel.toLowerCase()) {
-            // for later
+            case "unclaim": unClaimCommand(player); break;
         }
 
         return true;
@@ -140,6 +141,30 @@ public class LandCommands implements CommandExecutor {
         claim.setDisplayName(name);
         claim.claimChunk(player.getLocation().getChunk());
         player.sendMessage(Util.formatString("&aThis chunk has been claimed and a new land claim was setup with the name: &e" + claim.getDisplayName()));
+    }
+
+    private void unClaimCommand(Player player) {
+        LandClaim land = LandManager.getLandClaim(player.getLocation().getChunk());
+
+        if (!land.testAccessLevel(player, ACL.Level.FULL_ACCESS, "landmanager.unclaim.any")) {
+            player.sendMessage(Util.formatString("&cYou do not have permission to unclaim this chunk.")); return;
+        }
+
+        LandClaim.UnClaimResult unclaimResult = land.unclaimChunk(player.getLocation().getChunk());
+
+        String message = "";
+        switch (unclaimResult) {
+            case FAILED: message = "&cAn internal error has occurred while trying to un-claim this chunk, please contact a staff member."; break;
+            case SUCCESS: message = "&aChunk successfully un-claimed"; break;
+            case SUCCESS_LAST:
+                if (LandManager.deleteClaim(land))
+                    message = "&aChunk successfully un-claimed, &eAs this was the last chunk in the land claim the land claim has been deleted";
+                else
+                    message = "&cChunk was successfully un-claimed, as it was the last chunk in the Land Claim should have been deleted however an internal error occurred, please contact a staff members.";
+                break;
+        }
+
+        player.sendMessage(Util.formatString(message));
     }
 
     private void infoCommand(Player player) {

@@ -13,6 +13,9 @@ commands:
       description: Claim the chunk the player is standing in as a new claim, regardless of claims around it, optionally specify the name to give to this new claim, spaces are allowed
       permission: landmanager.claim
       usage: /newclaim [NAME]
+   unclaim:
+      description: Un-claim the chunk the player is standing in, if no other chunks exist in the Land Claim it will be deleted
+      permission: landmanager.unclaim
    linfo:
       description: Get information about the Land Claim the player is standing in
       permission: landmanager.linfo
@@ -26,15 +29,21 @@ permissions:
       description: Gives player permissions to claim and use Land
       children:
          landmanager.claim: true
+         landmanager.unclaim: true
          landmanager.linfo: true
    landmanager.land.moderator:
       description: Gives moderator permissions to manage land
       children:
          landmanager.land: true
+         landmanager.unclaim.any: true
          landmanager.enterany: true
          landmanager.linfo.any: true
    landmanager.claim:
-      description: Permission to use /claim command
+      description: Permission to use /claim and /newclaim commands
+   landmanager.unclaim:
+      description: Permission to use /unclaim command
+   landmanager.unclaim.any:
+      description: Permission to use /unclaim command on any chunk regardless of ACL Level
    landmanager.enterany:
       description: Permission to enter any land claim regardless of ACL Level
    landmanager.linfo:

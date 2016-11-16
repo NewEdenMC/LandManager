@@ -91,4 +91,26 @@ public class LandManager {
         return adjacentLand;
     }
 
+    public static boolean deleteClaim(LandClaim land) {
+        try {
+            landClaims.remove(land.getID());
+
+            PreparedStatement st = getDB().prepareStatement("DELETE FROM chunks WHERE land_id=?");
+            st.setInt(1, land.getID());
+            st.executeUpdate();
+
+            st = getDB().prepareStatement("DELETE FROM landclaims_acl WHERE land_id=?");
+            st.setInt(1, land.getID());
+            st.executeUpdate();
+
+            st = getDB().prepareStatement("DELETE FROM landclaims WHERE land_id=?");
+            st.setInt(1, land.getID());
+            st.executeUpdate();
+        } catch (SQLException e) {
+            getPlugin().getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to remove chunks to delete Land Claim #" + land.getID());
+            return false;
+        }
+        return true;
+    }
+
 }

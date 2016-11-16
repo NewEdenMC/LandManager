@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -116,6 +117,29 @@ public class LandClaim extends ACL {
         }
 
         return true;
+    }
+
+    public enum UnClaimResult { SUCCESS, SUCCESS_LAST, FAILED }
+
+    public UnClaimResult unclaimChunk(Chunk chunk) {
+        try {
+            PreparedStatement st = LandManager.db.prepareStatement("DELETE FROM chunks WHERE land_id=? AND x=? AND z=?;");
+            st.setInt(1, id);
+            st.setInt(2, chunk.getX());
+            st.setInt(3, chunk.getZ());
+            st.executeUpdate();
+
+            st = LandManager.db.prepareStatement("SELECT chunk_id FROM chunks WHERE land_id=?");
+            st.setInt(1, id);
+            ResultSet rs = st.executeQuery();
+            if (rs.isBeforeFirst())
+                return UnClaimResult.SUCCESS;
+            else
+                return UnClaimResult.SUCCESS_LAST;
+        } catch (SQLException e) {
+            LandManager.getPlugin().getLogger().log(java.util.logging.Level.SEVERE, "An SQL Exception occurred while trying to un-claim chunk \"" + chunk + "\" for land claim " + id + " (\"" + displayName + "\").", e);
+            return UnClaimResult.FAILED;
+        }
     }
 
     public boolean setAccess(UUID uuid, Level level) {
