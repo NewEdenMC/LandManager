@@ -1,11 +1,14 @@
 package co.neweden.LandManager;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import com.mojang.api.profiles.HttpProfileRepository;
+import com.mojang.api.profiles.Profile;
+import org.bukkit.*;
+import org.bukkit.entity.Player;
 
+import java.util.UUID;
 import java.util.logging.Level;
+
+import static org.bukkit.Bukkit.getPlayer;
 
 public class Util {
 
@@ -65,6 +68,24 @@ public class Util {
         }
 
         return new Location(world, x, y, z);
+    }
+
+    public static OfflinePlayer getOfflinePlayer(String name) {
+        Player player = getPlayer(name);
+        if (player != null) return player;
+
+        for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
+            if (offlinePlayer.getName().equals(name))
+                return offlinePlayer;
+        }
+
+        HttpProfileRepository hpr = new HttpProfileRepository("minecraft");
+        Profile[] p = hpr.findProfilesByNames(name);
+        if (p.length > 0) {
+            String uuid = p[0].getId().replaceFirst("([0-9a-fA-F]{8})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]+)", "$1-$2-$3-$4-$5");
+            return Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+        } else
+            return null;
     }
 
 }
