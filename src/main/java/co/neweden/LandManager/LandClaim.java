@@ -51,7 +51,7 @@ public class LandClaim extends ACL {
             st.executeUpdate();
             return true;
         } catch (SQLException e) {
-            LandManager.getPlugin().getLogger().log(java.util.logging.Level.SEVERE, "Land Claim #" + id + ": An SQL Exception occurred while trying to update " + key + " to \"" + value + "\"");
+            LandManager.getPlugin().getLogger().log(java.util.logging.Level.SEVERE, "Land Claim #" + id + ": An SQL Exception occurred while trying to update " + key + " to \"" + value + "\"", e);
             return false;
         }
     }
