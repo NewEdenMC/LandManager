@@ -17,6 +17,8 @@ public class LandManager {
 
     public static Connection getDB() { return db; }
 
+    public static Collection<LandClaim> getLandClaims() { return new HashSet<>(landClaims.values()); }
+
     public static LandClaim getLandClaim(int landID) { return landClaims.get(landID); }
 
     public static LandClaim getLandClaim(Chunk chunk) {
