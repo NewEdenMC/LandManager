@@ -64,7 +64,7 @@ public class LandClaim extends ACL {
     }
 
     public boolean setDisplayName(String name) {
-        if (setDBValue("displayName", name)) {
+        if (setDBValue("displayName", (name != null) ? name : null)) {
             displayName = name;
             return true;
         } else
@@ -111,7 +111,7 @@ public class LandClaim extends ACL {
     public Material getIconMaterial() { return iconMaterial; }
 
     public boolean setIconMaterial(Material material) {
-        if (setDBValue("icon_material", material.toString())) {
+        if (setDBValue("icon_material", (material != null) ? material.toString() : null)) {
             iconMaterial = material;
             return true;
         } else
