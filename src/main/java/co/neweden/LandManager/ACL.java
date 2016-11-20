@@ -42,8 +42,8 @@ public abstract class ACL {
 
     public Map<UUID, Level> getACL() {
         Map<UUID, Level> acl = new LinkedHashMap<>();
-        acl.put(getOwner(), Level.FULL_ACCESS);
         acl.putAll(list);
+        acl.put(getOwner(), Level.FULL_ACCESS);
         acl.put(null, getEveryoneAccessLevel());
         return acl;
     }
