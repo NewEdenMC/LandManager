@@ -60,6 +60,8 @@ public abstract class ACL {
 
     public abstract Level getEveryoneAccessLevel();
 
+    public abstract boolean setEveryoneAccessLevel(Level level);
+
     public abstract boolean setAccess(UUID uuid, Level level);
 
 }
