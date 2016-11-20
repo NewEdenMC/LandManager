@@ -7,6 +7,7 @@ import co.neweden.LandManager.Util;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -29,6 +30,8 @@ public class LandCommands implements CommandExecutor {
         LandManager.getPlugin().getCommand("lremove").setExecutor(this);
         LandManager.getPlugin().getCommand("lpublic").setExecutor(this);
         LandManager.getPlugin().getCommand("lprivate").setExecutor(this);
+        LandManager.getPlugin().getCommand("lrename").setExecutor(this);
+        LandManager.getPlugin().getCommand("licon").setExecutor(this);
     }
 
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
@@ -63,6 +66,8 @@ public class LandCommands implements CommandExecutor {
             case "lremove": removeCommand(land, player, args); break;
             case "lpublic": publicCommand(land, player, args); break;
             case "lprivate": privateCommand(land, player); break;
+            case "lrename": renameCommand(land, player, args); break;
+            case "licon": iconCommand(land, player, args); break;
         }
 
         return true;
@@ -320,6 +325,61 @@ public class LandCommands implements CommandExecutor {
             player.sendMessage(Util.formatString("&aLand set to private, access level for EVERYONE has been reset to default."));
         else
             player.sendMessage(Util.formatString("&cAn internal error occurred while trying to update the ACL level for EVERYONE, please contact a staff member."));
+    }
+
+    private void renameCommand(LandClaim land, Player player, String[] args) {
+        if (!land.testAccessLevel(player, ACL.Level.MODIFY, "landmanager.lrename.any")) {
+            player.sendMessage(Util.formatString("&cYou do not have permission to rename this Land."));
+            return;
+        }
+
+        if (args.length == 0) {
+            player.sendMessage(Util.formatString("&cYou did not specify a name for this Land, use \"/lrename clear\" to reset the name to the default.")); return;
+        }
+
+        String name = null;
+        String success = "&aLand name cleared and reset to the default.";
+        if (!args[0].equalsIgnoreCase("clear")) {
+            name = "";
+            for (int i = 0; i < args.length; i++) {
+                name += args[i] + " ";
+            }
+            name = name.substring(0, name.length() - 1);
+            success = "&aLand name has been changed to &e" + name;
+        }
+
+        if (land.setDisplayName(name))
+            player.sendMessage(Util.formatString(success));
+        else
+            player.sendMessage(Util.formatString("&cAn internal error occurred while trying to set the name for this Land, please contact a staff member."));
+    }
+
+    private void iconCommand(LandClaim land, Player player, String[] args) {
+        if (!land.testAccessLevel(player, ACL.Level.MODIFY, "landmanager.licon.any")) {
+            player.sendMessage(Util.formatString("&cYou do not have permission to set the icon for this Land."));
+            return;
+        }
+
+        if (args.length == 0) {
+            player.sendMessage(Util.formatString("&cYou did not specify a Material for this Land's Icon, use \"/licon clear\" to reset the icon to the default.")); return;
+        }
+
+        Material material = null;
+        String success = "&aLand Icon cleared and reset to the default.";
+        if (!args[0].equalsIgnoreCase("clear")) {
+            try {
+                material = Material.valueOf(args[0].toUpperCase());
+                success = "&aLand Icon has been set to the Material &e" + material;
+            } catch (IllegalArgumentException e) {
+                player.sendMessage(Util.formatString("&cMaterial \"" + args[0] + "\" is not a valid Minecraft Material Name, \"/itemdb\" might help you."));
+                return;
+            }
+        }
+
+        if (land.setIconMaterial(material))
+            player.sendMessage(Util.formatString(success));
+        else
+            player.sendMessage(Util.formatString("&cAn internal error occurred while trying to set the Icon for this Land, please contact a staff member."));
     }
 
 }
