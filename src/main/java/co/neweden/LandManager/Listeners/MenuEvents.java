@@ -1,5 +1,6 @@
 package co.neweden.LandManager.Listeners;
 
+import co.neweden.LandManager.ACL;
 import co.neweden.LandManager.LandClaim;
 import co.neweden.LandManager.LandManager;
 import co.neweden.LandManager.Util;
@@ -29,8 +30,10 @@ public class MenuEvents implements Listener {
 
         List<LandClaim> landList = new ArrayList<>();
         for (LandClaim land : LandManager.getLandClaims()) {
-            if (land.getACL().containsKey(forPlayer.getUniqueId()))
+            if (land.getACL().containsKey(forPlayer.getUniqueId()) &&
+                    !land.getACL().get(forPlayer.getUniqueId()).equals(ACL.Level.NO_ACCESS)) {
                 landList.add(land);
+            }
         }
 
         for (int i = 0; i < landList.size(); i++) {
