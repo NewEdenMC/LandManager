@@ -91,7 +91,7 @@ public class LandClaim extends ACL {
     }
 
     public boolean setEveryoneAccessLevel(Level level) {
-        if (setDBValue("everyone_acl_level", level.toString())) {
+        if (setDBValue("everyone_acl_level", (level != null) ? level.toString() : null)) {
             everyoneAccessLevel = level;
             return true;
         } else
