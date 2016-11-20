@@ -209,7 +209,7 @@ public class LandCommands implements CommandExecutor {
 
     public void transferCommand(LandClaim land, Player player, String[] args) {
         if (!land.testAccessLevel(player, ACL.Level.FULL_ACCESS, "landmanager.ltransfer.any")) {
-            player.sendMessage(Util.formatString("&cYou do not have permission to transfer this chunk.")); return;
+            player.sendMessage(Util.formatString("&cYou do not have permission to transfer this Land to another player.")); return;
         }
 
         if (args.length == 0) {
@@ -240,7 +240,7 @@ public class LandCommands implements CommandExecutor {
         OfflinePlayer addPlayer = Util.getOfflinePlayer(args[0]);
 
         if (addPlayer == null) {
-            player.sendMessage(Util.formatString("&cPlayer \"" + args[0] + "\"not found.")); return;
+            player.sendMessage(Util.formatString("&cPlayer \"" + args[0] + "\" not found.")); return;
         }
 
         ACL.Level level = ACL.Level.MODIFY;
