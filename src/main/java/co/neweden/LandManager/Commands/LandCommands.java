@@ -3,7 +3,9 @@ package co.neweden.LandManager.Commands;
 import co.neweden.LandManager.ACL;
 import co.neweden.LandManager.LandClaim;
 import co.neweden.LandManager.LandManager;
+import co.neweden.LandManager.Listeners.MenuEvents;
 import co.neweden.LandManager.Util;
+import co.neweden.menugui.menu.MenuInstance;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
@@ -32,6 +34,7 @@ public class LandCommands implements CommandExecutor {
         LandManager.getPlugin().getCommand("lprivate").setExecutor(this);
         LandManager.getPlugin().getCommand("lrename").setExecutor(this);
         LandManager.getPlugin().getCommand("licon").setExecutor(this);
+        LandManager.getPlugin().getCommand("listland").setExecutor(this);
     }
 
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
@@ -43,10 +46,11 @@ public class LandCommands implements CommandExecutor {
         Player player = (Player) sender;
         boolean end = true;
 
-        switch (commandLabel.toLowerCase()) {
+        switch (command.getName().toLowerCase()) {
             case "claim": claimCommand(player, args); break;
             case "newclaim": newClaimCommand(player, args); break;
             case "linfo": infoCommand(player); break;
+            case "listland": listCommand(commandLabel, player, args); break;
             default: end = false;
         }
 
@@ -59,7 +63,7 @@ public class LandCommands implements CommandExecutor {
 
         LandClaim land = LandManager.getLandClaim(player.getLocation().getChunk());
 
-        switch (commandLabel.toLowerCase()) {
+        switch (command.getName().toLowerCase()) {
             case "unclaim": unClaimCommand(land, player); break;
             case "ltransfer": transferCommand(land, player, args); break;
             case "ladd": addCommand(land, player, args); break;
@@ -380,6 +384,18 @@ public class LandCommands implements CommandExecutor {
             player.sendMessage(Util.formatString(success));
         else
             player.sendMessage(Util.formatString("&cAn internal error occurred while trying to set the Icon for this Land, please contact a staff member."));
+    }
+
+    private void listCommand(String commandLabel, Player player, String[] args) {
+        OfflinePlayer forPlayer = player;
+        if (player.hasPermission("landmanager.listland.others") && args.length > 0 && commandLabel.equalsIgnoreCase("listland")) {
+            forPlayer = Util.getOfflinePlayer(args[0]);
+            if (forPlayer == null) {
+                player.sendMessage(Util.formatString("&cPlayer \"" + args[0] + "\" not found")); return;
+            }
+        }
+        MenuEvents.landListMenuSubjects.put(player.getUniqueId(), forPlayer);
+        LandManager.getLandListMenu().openMenu(player);
     }
 
 }

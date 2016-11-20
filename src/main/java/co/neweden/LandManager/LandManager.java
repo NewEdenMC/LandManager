@@ -1,5 +1,6 @@
 package co.neweden.LandManager;
 
+import co.neweden.menugui.menu.Menu;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 
@@ -12,10 +13,13 @@ public class LandManager {
     protected static Main plugin;
     protected static Connection db;
     protected static Map<Integer, LandClaim> landClaims = new HashMap<>();
+    protected static Menu landListMenu;
 
     public static Main getPlugin() { return plugin; }
 
     public static Connection getDB() { return db; }
+
+    public static Menu getLandListMenu() { return landListMenu; }
 
     public static Collection<LandClaim> getLandClaims() { return new HashSet<>(landClaims.values()); }
 

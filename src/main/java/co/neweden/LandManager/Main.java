@@ -3,6 +3,8 @@ package co.neweden.LandManager;
 import co.neweden.LandManager.Commands.LandCommands;
 import co.neweden.LandManager.Listeners.BlockEvents;
 import co.neweden.LandManager.Listeners.LocationEvents;
+import co.neweden.LandManager.Listeners.MenuEvents;
+import co.neweden.menugui.MenuGUI;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -20,12 +22,13 @@ public class Main extends JavaPlugin {
         new LandCommands();
         getServer().getPluginManager().registerEvents(new LocationEvents(), this);
         getServer().getPluginManager().registerEvents(new BlockEvents(), this);
+        getServer().getPluginManager().registerEvents(new MenuEvents(), this);
         startup();
     }
 
     private boolean startup() {
         saveDefaultConfig();
-        if (!loadDBConnection() || !setupDB() || !loadClaims())
+        if (!loadDBConnection() || !setupDB() || !loadClaims() || !setupMenu())
             return false;
         return true;
     }
@@ -124,6 +127,13 @@ public class Main extends JavaPlugin {
             return false;
         }
         getLogger().log(Level.INFO, "Loaded " + LandManager.landClaims.size() + " Land Claims from the Database.");
+        return true;
+    }
+
+    private boolean setupMenu() {
+        LandManager.landListMenu = MenuGUI.newMenu("landlist");
+        LandManager.landListMenu.setNumRows(6);
+        LandManager.landListMenu.setTitle("Select a Land Claim to teleport to it");
         return true;
     }
 
