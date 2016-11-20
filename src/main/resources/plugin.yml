@@ -23,6 +23,10 @@ commands:
       description: Transfer ownership of the Land Claim the player is standing in to another player
       permission: landmanager.ltransfer
       usage: /ltransfer [PLAYER_NAME]
+   ladd:
+      description: Add another player to the access list for the Land the player is standing in
+      permission: landmanager.ladd
+      usage: /ladd [PLAYER_NAME] [LEVEL]
 permissions:
    landmanager.*:
       description: Gives all LandManager permission nodes
@@ -36,6 +40,7 @@ permissions:
          landmanager.unclaim: true
          landmanager.linfo: true
          landmanager.ltransfer: true
+         landmanager.ladd: true
    landmanager.land.moderator:
       description: Gives moderator permissions to manage land
       children:
@@ -44,6 +49,7 @@ permissions:
          landmanager.enterany: true
          landmanager.linfo.any: true
          landmanager.ltransfer.any: true
+         landmanager.ladd.any: true
    landmanager.claim:
       description: Permission to use /claim and /newclaim commands
    landmanager.unclaim:
@@ -60,3 +66,7 @@ permissions:
       description: Permission to use /linfo command
    landmanager.ltransfer.any:
       description: Permission to use /ltransfer command regardless of ACL Level
+   landmanager.ladd:
+      description: Permission to use /ladd command
+   landmanager.ladd.any:
+      description: Permission to use /ladd command regardless of ACL Level

@@ -25,6 +25,7 @@ public class LandCommands implements CommandExecutor {
         LandManager.getPlugin().getCommand("unclaim").setExecutor(this);
         LandManager.getPlugin().getCommand("linfo").setExecutor(this);
         LandManager.getPlugin().getCommand("ltransfer").setExecutor(this);
+        LandManager.getPlugin().getCommand("ladd").setExecutor(this);
     }
 
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
@@ -55,6 +56,7 @@ public class LandCommands implements CommandExecutor {
         switch (commandLabel.toLowerCase()) {
             case "unclaim": unClaimCommand(land, player); break;
             case "ltransfer": transferCommand(land, player, args); break;
+            case "ladd": addCommand(land, player, args); break;
         }
 
         return true;
@@ -222,6 +224,38 @@ public class LandCommands implements CommandExecutor {
             player.sendMessage(Util.formatString("&cAn internal error occurred while trying to transfer ownership of the Land, please contact a staff member."));
 
         player.sendMessage(Util.formatString("&aYou have successfully transferred ownership of Land &e" + land.getDisplayName() + "&a to &e" + toPlayer.getName()));
+    }
+
+    private void addCommand(LandClaim land, Player player, String[] args) {
+        if (!land.testAccessLevel(player, ACL.Level.MODIFY, "landmanager.ladd.any")) {
+            player.sendMessage(Util.formatString("&cYou do not have permission to add another player to this land.")); return;
+        }
+
+        if (args.length == 0) {
+            player.sendMessage(Util.formatString("&cYou did not specify a player to add to this land.")); return;
+        }
+
+        OfflinePlayer addPlayer = Util.getOfflinePlayer(args[0]);
+
+        if (addPlayer == null) {
+            player.sendMessage(Util.formatString("&cPlayer \"" + args[0] + "\"not found.")); return;
+        }
+
+        ACL.Level level = ACL.Level.MODIFY;
+        if (args.length >= 2) {
+            try {
+                level = ACL.Level.valueOf(args[1].toUpperCase());
+                if (!level.equals(ACL.Level.INTERACT) && !level.equals(ACL.Level.MODIFY))
+                    throw new IllegalArgumentException();
+            } catch (IllegalArgumentException e) {
+                player.sendMessage(Util.formatString("&cThe ACL Level \"" + args[1] + "\" is not valid or is not allowed, allowed levels are: INTERACT, MODIFY")); return;
+            }
+        }
+
+        if (land.setAccess(addPlayer.getUniqueId(), level))
+            player.sendMessage(Util.formatString("&aPlayer &e" + addPlayer.getName() + "&a added to Land with access level &e" + level));
+        else
+            player.sendMessage(Util.formatString("&cAn internal error occurred while trying to update the ACL, please contact a staff member."));
     }
 
 }
