@@ -2,9 +2,8 @@ package co.neweden.LandManager;
 
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class ACL {
 
@@ -41,11 +40,16 @@ public abstract class ACL {
     }
 
     public Map<UUID, Level> getACL() {
-        Map<UUID, Level> acl = new HashMap<>();
-        acl.putAll(list);
+        Map<UUID, Level> acl = new HashMap<>(list);
         acl.put(getOwner(), Level.FULL_ACCESS);
-        acl.put(null, getEveryoneAccessLevel());
-        return acl;
+
+        Map<UUID, Level> sortedACL = new LinkedHashMap<>();
+        acl.entrySet().stream()
+                .sorted(Map.Entry.<UUID, Level>comparingByValue().reversed())
+                .forEach(e -> sortedACL.put(e.getKey(), e.getValue()));
+        sortedACL.put(null, getEveryoneAccessLevel());
+
+        return sortedACL;
     }
 
     public Level getAccessLevel(UUID uuid) {
