@@ -31,6 +31,13 @@ commands:
       description: Add another player from the access list for the Land the player is standing in
       permission: landmanager.lremove
       usage: /ladd [PLAYER_NAME]
+   lpublic:
+      description: Make the Land public so everyone can use it
+      permission: landmanager.lpublic
+      usage: /lpublic [LEVEL]
+   lprivate:
+      description: Make the Land private resetting the aCL level fro everyone back to thee default
+      permission: landmanager.lprivate
 permissions:
    landmanager.*:
       description: Gives all LandManager permission nodes
@@ -46,6 +53,8 @@ permissions:
          landmanager.ltransfer: true
          landmanager.ladd: true
          landmanager.lremove: true
+         landmanager.lpublic: true
+         landmanager.lprivate: true
    landmanager.land.moderator:
       description: Gives moderator permissions to manage land
       children:
@@ -56,6 +65,8 @@ permissions:
          landmanager.ltransfer.any: true
          landmanager.ladd.any: true
          landmanager.lremove.any: true
+         landmanager.lpublic.any: true
+         landmanager.lprivate.any: true
    landmanager.claim:
       description: Permission to use /claim and /newclaim commands
    landmanager.unclaim:
@@ -80,3 +91,11 @@ permissions:
       description: Permission to use /lremove command
    landmanager.lremove.any:
       description: Permission to use /lremove command regardless of ACL Level
+   landmanager.lpublic:
+      description: Permission to use /lpublic command
+   landmanager.lpublic.any:
+      description: Permission to use /lpublic command regardless of ACL Level
+   landmanager.lprivate:
+      description: Permission to use /lprivate command
+   landmanager.lprivate.any:
+      description: Permission to use /lprivate command regardless of ACL Level

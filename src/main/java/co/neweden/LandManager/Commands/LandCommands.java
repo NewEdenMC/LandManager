@@ -27,6 +27,8 @@ public class LandCommands implements CommandExecutor {
         LandManager.getPlugin().getCommand("ltransfer").setExecutor(this);
         LandManager.getPlugin().getCommand("ladd").setExecutor(this);
         LandManager.getPlugin().getCommand("lremove").setExecutor(this);
+        LandManager.getPlugin().getCommand("lpublic").setExecutor(this);
+        LandManager.getPlugin().getCommand("lprivate").setExecutor(this);
     }
 
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
@@ -59,6 +61,8 @@ public class LandCommands implements CommandExecutor {
             case "ltransfer": transferCommand(land, player, args); break;
             case "ladd": addCommand(land, player, args); break;
             case "lremove": removeCommand(land, player, args); break;
+            case "lpublic": publicCommand(land, player, args); break;
+            case "lprivate": privateCommand(land, player); break;
         }
 
         return true;
@@ -263,7 +267,7 @@ public class LandCommands implements CommandExecutor {
     private void removeCommand(LandClaim land, Player player, String[] args) {
         if (!land.testAccessLevel(player, ACL.Level.MODIFY, "landmanager.lremove.any")) {
             player.sendMessage(Util.formatString("&cYou do not have permission to remove another player from this land.")); return;
-    }
+        }
 
         if (args.length == 0) {
             player.sendMessage(Util.formatString("&cYou did not specify a player to remove from this land.")); return;
@@ -283,6 +287,39 @@ public class LandCommands implements CommandExecutor {
             player.sendMessage(Util.formatString("&aPlayer &e" + removePlayer.getName() + "&a remove from Land"));
         else
             player.sendMessage(Util.formatString("&cAn internal error occurred while trying to update the ACL, please contact a staff member."));
+    }
+
+    private void publicCommand(LandClaim land, Player player, String[] args) {
+        if (!land.testAccessLevel(player, ACL.Level.MODIFY, "landmanager.lpublic.any")) {
+            player.sendMessage(Util.formatString("&cYou do not have permission to set this land as public.")); return;
+        }
+
+        ACL.Level level = ACL.Level.INTERACT;
+        if (args.length >= 1) {
+            try {
+                level = ACL.Level.valueOf(args[0].toUpperCase());
+                if (!level.equals(ACL.Level.VIEW) && !level.equals(ACL.Level.INTERACT))
+                    throw new IllegalArgumentException();
+            } catch (IllegalArgumentException e) {
+                player.sendMessage(Util.formatString("&cThe ACL Level \"" + args[0] + "\" is not valid or is not allowed, allowed levels are: VIEW, INTERACT")); return;
+            }
+        }
+
+        if (land.setEveryoneAccessLevel(level))
+            player.sendMessage(Util.formatString("&aLand set to public, access level for EVERYONE set to &e" + level));
+        else
+            player.sendMessage(Util.formatString("&cAn internal error occurred while trying to update the ACL level for EVERYONE, please contact a staff member."));
+    }
+
+    private void privateCommand(LandClaim land, Player player) {
+        if (!land.testAccessLevel(player, ACL.Level.MODIFY, "landmanager.lprivate.any")) {
+            player.sendMessage(Util.formatString("&cYou do not have permission to set this land as private.")); return;
+        }
+
+        if (land.setEveryoneAccessLevel(null))
+            player.sendMessage(Util.formatString("&aLand set to private, access level for EVERYONE has been reset to default."));
+        else
+            player.sendMessage(Util.formatString("&cAn internal error occurred while trying to update the ACL level for EVERYONE, please contact a staff member."));
     }
 
 }
