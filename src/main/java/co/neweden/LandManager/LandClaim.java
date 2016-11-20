@@ -172,7 +172,7 @@ public class LandClaim extends ACL {
             }
 
             if (list.containsKey(uuid)) {
-                st = LandManager.getDB().prepareStatement("UPDATE landclaim_acl SET level=? WHERE land_id=? AND uuid=?");
+                st = LandManager.getDB().prepareStatement("UPDATE landclaims_acl SET level=? WHERE land_id=? AND uuid=?");
                 st.setString(1, level.toString());
                 st.setInt(2, getID());
                 st.setString(3, uuid.toString());
