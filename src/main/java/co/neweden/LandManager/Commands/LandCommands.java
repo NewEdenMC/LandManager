@@ -7,6 +7,7 @@ import co.neweden.LandManager.Util;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,6 +24,7 @@ public class LandCommands implements CommandExecutor {
         LandManager.getPlugin().getCommand("newclaim").setExecutor(this);
         LandManager.getPlugin().getCommand("unclaim").setExecutor(this);
         LandManager.getPlugin().getCommand("linfo").setExecutor(this);
+        LandManager.getPlugin().getCommand("ltransfer").setExecutor(this);
     }
 
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
@@ -48,8 +50,11 @@ public class LandCommands implements CommandExecutor {
             return true;
         }
 
+        LandClaim land = LandManager.getLandClaim(player.getLocation().getChunk());
+
         switch (commandLabel.toLowerCase()) {
-            case "unclaim": unClaimCommand(player); break;
+            case "unclaim": unClaimCommand(land, player); break;
+            case "ltransfer": transferCommand(land, player, args); break;
         }
 
         return true;
@@ -143,9 +148,7 @@ public class LandCommands implements CommandExecutor {
         player.sendMessage(Util.formatString("&aThis chunk has been claimed and a new land claim was setup with the name: &e" + claim.getDisplayName()));
     }
 
-    private void unClaimCommand(Player player) {
-        LandClaim land = LandManager.getLandClaim(player.getLocation().getChunk());
-
+    private void unClaimCommand(LandClaim land, Player player) {
         if (!land.testAccessLevel(player, ACL.Level.FULL_ACCESS, "landmanager.unclaim.any")) {
             player.sendMessage(Util.formatString("&cYou do not have permission to unclaim this chunk.")); return;
         }
@@ -198,6 +201,27 @@ public class LandCommands implements CommandExecutor {
                 "Land owned by: " + owner + "&r\n\n" +
                 "Access Control List:\n" + acl
         ));
+    }
+
+    public void transferCommand(LandClaim land, Player player, String[] args) {
+        if (!land.testAccessLevel(player, ACL.Level.FULL_ACCESS, "landmanager.ltransfer.any")) {
+            player.sendMessage(Util.formatString("&cYou do not have permission to transfer this chunk.")); return;
+        }
+
+        if (args.length == 0) {
+            player.sendMessage(Util.formatString("&cYou did not specify a player to transfer this land to.")); return;
+        }
+
+        OfflinePlayer toPlayer = Util.getOfflinePlayer(args[0]);
+
+        if (toPlayer == null) {
+            player.sendMessage(Util.formatString("&cPlayer \"" + args[0] + "\"not found.")); return;
+        }
+
+        if (!land.setOwner(toPlayer.getUniqueId()) || !land.setAccess(player.getUniqueId(), ACL.Level.MODIFY))
+            player.sendMessage(Util.formatString("&cAn internal error occurred while trying to transfer ownership of the Land, please contact a staff member."));
+
+        player.sendMessage(Util.formatString("&aYou have successfully transferred ownership of Land &e" + land.getDisplayName() + "&a to &e" + toPlayer.getName()));
     }
 
 }
