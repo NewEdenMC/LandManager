@@ -169,7 +169,6 @@ public class LandCommands implements CommandExecutor {
                 player.sendMessage(Util.formatString("&cAn internal error has occurred while trying to create a new Land Claim, please contact a staff member."));
                 return;
             }
-            player.sendMessage(name);
             claim.setDisplayName(name);
             claim.claimChunk(player.getLocation().getChunk());
             player.sendMessage(Util.formatString("&aThis chunk has been claimed and a new land claim was setup with the name: &e" + claim.getDisplayName()));
