@@ -74,7 +74,7 @@ permissions:
       children:
          landmanager.land: true
          landmanager.unclaim.any: true
-         landmanager.enterany: true
+         landmanager.land.enterany: true
          landmanager.linfo.any: true
          landmanager.ltransfer.any: true
          landmanager.ladd.any: true
@@ -90,7 +90,7 @@ permissions:
       description: Permission to use /unclaim command
    landmanager.unclaim.any:
       description: Permission to use /unclaim command on any chunk regardless of ACL Level
-   landmanager.enterany:
+   landmanager.land.enterany:
       description: Permission to enter any land claim regardless of ACL Level
    landmanager.linfo:
       description: Permission to use /linfo command
