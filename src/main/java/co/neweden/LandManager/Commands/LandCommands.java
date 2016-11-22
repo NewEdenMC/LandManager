@@ -133,7 +133,7 @@ public class LandCommands implements CommandExecutor {
                     player.sendMessage(Util.formatString("&cAn internal error has occurred while trying to claim chunk for existing claim, please contact a staff member."));
                 return;
             } catch (RestrictedWorldException e) {
-                player.sendMessage(Util.formatString("&c" + e.getMessage()));
+                player.sendMessage(Util.formatString("&c" + e.getMessage())); return;
             }
         }
 
@@ -163,19 +163,19 @@ public class LandCommands implements CommandExecutor {
             name = name.substring(0, name.length() - 1);
         }
 
-        LandClaim claim = LandManager.createClaim(player.getUniqueId(), player.getLocation());
-        if (claim == null) {
-            player.sendMessage(Util.formatString("&cAn internal error has occurred while trying to create a new Land Claim, please contact a staff member."));
-            return;
-        }
-        player.sendMessage(name);
-        claim.setDisplayName(name);
         try {
+            LandClaim claim = LandManager.createClaim(player.getUniqueId(), player.getLocation());
+            if (claim == null) {
+                player.sendMessage(Util.formatString("&cAn internal error has occurred while trying to create a new Land Claim, please contact a staff member."));
+                return;
+            }
+            player.sendMessage(name);
+            claim.setDisplayName(name);
             claim.claimChunk(player.getLocation().getChunk());
+            player.sendMessage(Util.formatString("&aThis chunk has been claimed and a new land claim was setup with the name: &e" + claim.getDisplayName()));
         } catch (RestrictedWorldException e) {
-            player.sendMessage(Util.formatString("&c" + e.getMessage()));
+            player.sendMessage(Util.formatString("&c" + e.getUserMessage()));
         }
-        player.sendMessage(Util.formatString("&aThis chunk has been claimed and a new land claim was setup with the name: &e" + claim.getDisplayName()));
     }
 
     private void unClaimCommand(LandClaim land, Player player) {

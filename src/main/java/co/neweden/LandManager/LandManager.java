@@ -1,8 +1,10 @@
 package co.neweden.LandManager;
 
+import co.neweden.LandManager.Exceptions.RestrictedWorldException;
 import co.neweden.menugui.menu.Menu;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.sql.*;
 import java.util.*;
@@ -44,7 +46,7 @@ public class LandManager {
         return (getLandClaim(chunk) != null);
     }
 
-    public static LandClaim createClaim(UUID owner, Location homeLocation) {
+    public static LandClaim createClaim(UUID owner, Location homeLocation) throws RestrictedWorldException {
         try {
             PreparedStatement st = LandManager.db.prepareStatement("INSERT INTO `landclaims` (`owner`, `home_location`) VALUES (?, ?);", Statement.RETURN_GENERATED_KEYS);
             st.setString(1, owner.toString());
@@ -52,6 +54,9 @@ public class LandManager {
             st.executeUpdate();
             ResultSet rs = st.getGeneratedKeys();
             rs.next();
+
+            if (LandManager.isWorldRestricted(homeLocation.getWorld()))
+                throw new RestrictedWorldException(homeLocation.getWorld(), "Unable to create Land Claim in this World as it is restricted by the configuration.", "You are not allowed to create a Land Claim in this world.");
 
             int landID = rs.getInt(1);
             LandClaim claim = new LandClaim(landID);
@@ -64,6 +69,21 @@ public class LandManager {
             getPlugin().getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to create a new Land Claim.", e);
             return null;
         }
+    }
+
+    public static boolean isWorldRestricted(World world) {
+        String restrictedMode = LandManager.getPlugin().getConfig().getString("land_claims.restricted_worlds_mode", "");
+        Collection<String> restrictedWorlds = LandManager.getPlugin().getConfig().getStringList("land_claims.restricted_worlds_list");
+
+        if (restrictedMode.equalsIgnoreCase("whitelist")) {
+            if (!restrictedWorlds.contains(world.getName()))
+                return true;
+        } else if (restrictedMode.equalsIgnoreCase("blacklist")) {
+            if (restrictedWorlds.contains(world.getName()))
+                return true;
+        }
+
+        return false;
     }
 
     public static Collection<LandClaim> getAdjacentClaims(Chunk chunk) { return getAdjacentClaims(chunk, null); }

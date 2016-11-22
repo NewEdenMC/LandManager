@@ -124,15 +124,8 @@ public class LandClaim extends ACL {
         if (LandManager.isChunkClaimed(chunk))
             return false;
 
-        String restrictedMode = LandManager.getPlugin().getConfig().getString("land_claims.restricted_worlds_mode", "");
-        Collection<String> restrictedWorlds = LandManager.getPlugin().getConfig().getStringList("land_claims.restricted_worlds_list");
-        if (restrictedMode.equalsIgnoreCase("whitelist")) {
-            if (!restrictedWorlds.contains(chunk.getWorld().getName()))
-                throw new RestrictedWorldException(chunk.getWorld(), "Chunks cannot be claimed in this world.");
-        } else if (restrictedMode.equalsIgnoreCase("blacklist")) {
-            if (restrictedWorlds.contains(chunk.getWorld().getName()))
-                throw new RestrictedWorldException(chunk.getWorld(), "Chunks cannot be claimed in this world.");
-        }
+        if (LandManager.isWorldRestricted(chunk.getWorld()))
+            throw new RestrictedWorldException(chunk.getWorld(), "Unable to claim chunk as the World is restricted by the configuration.", "It is not possible to claim a chunk in this world.");
 
         try {
             PreparedStatement st = LandManager.db.prepareStatement("INSERT INTO `chunks` (`land_id`, `world`, `x`, `z`) VALUES (?, ?, ?, ?);");
