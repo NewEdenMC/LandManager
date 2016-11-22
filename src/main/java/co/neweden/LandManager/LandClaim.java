@@ -173,6 +173,7 @@ public class LandClaim extends ACL {
                 st.setInt(1, getID());
                 st.setString(2, uuid.toString());
                 list.remove(uuid);
+                st.executeUpdate();
                 return true;
             }
 
