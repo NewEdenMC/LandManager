@@ -6,6 +6,7 @@ import co.neweden.LandManager.Listeners.LocationEvents;
 import co.neweden.LandManager.Listeners.MenuEvents;
 import co.neweden.menugui.MenuGUI;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.DriverManager;
@@ -119,6 +120,12 @@ public class Main extends JavaPlugin {
                     continue;
                 }
                 claim.homeLocation = homeLocation;
+
+                try {
+                    claim.setIconMaterial(Material.valueOf(rs.getString("icon_material")));
+                } catch (IllegalArgumentException e) {
+                    getLogger().log(Level.SEVERE, "Land Claim #" + land_id + ": Icon Material \"" + rs.getString("icon_material") + "\" is not valid, default value will be used instead.");
+                }
 
                 LandManager.landClaims.put(land_id, claim);
             }
