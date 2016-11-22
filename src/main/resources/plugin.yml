@@ -46,7 +46,7 @@ commands:
       permission: landmanager.licon
    listland:
       description: Displays Land that the current player or the given player has access to
-      permission: landmanager.lland
+      permission: landmanager.listland
       usage: /listland [PLAYER_NAME]
       aliases: myland
 permissions:
