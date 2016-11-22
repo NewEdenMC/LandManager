@@ -1,5 +1,6 @@
 package co.neweden.LandManager;
 
+import co.neweden.LandManager.Exceptions.RestrictedWorldException;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -7,6 +8,7 @@ import org.bukkit.Material;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -118,9 +120,19 @@ public class LandClaim extends ACL {
             return false;
     }
 
-    public boolean claimChunk(Chunk chunk) {
+    public boolean claimChunk(Chunk chunk) throws RestrictedWorldException {
         if (LandManager.isChunkClaimed(chunk))
             return false;
+
+        String restrictedMode = LandManager.getPlugin().getConfig().getString("land_claims.restricted_worlds_mode", "");
+        Collection<String> restrictedWorlds = LandManager.getPlugin().getConfig().getStringList("land_claims.restricted_worlds_list");
+        if (restrictedMode.equalsIgnoreCase("whitelist")) {
+            if (!restrictedWorlds.contains(chunk.getWorld().getName()))
+                throw new RestrictedWorldException(chunk.getWorld(), "Chunks cannot be claimed in this world.");
+        } else if (restrictedMode.equalsIgnoreCase("blacklist")) {
+            if (restrictedWorlds.contains(chunk.getWorld().getName()))
+                throw new RestrictedWorldException(chunk.getWorld(), "Chunks cannot be claimed in this world.");
+        }
 
         try {
             PreparedStatement st = LandManager.db.prepareStatement("INSERT INTO `chunks` (`land_id`, `world`, `x`, `z`) VALUES (?, ?, ?, ?);");

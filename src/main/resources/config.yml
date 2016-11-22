@@ -4,3 +4,7 @@ mysql:
    database: landmanager
    user: mc
    password:
+
+land_claims:
+   restricted_worlds_mode: whitelist
+   restricted_worlds_list: []

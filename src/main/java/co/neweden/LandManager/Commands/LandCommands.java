@@ -1,6 +1,7 @@
 package co.neweden.LandManager.Commands;
 
 import co.neweden.LandManager.ACL;
+import co.neweden.LandManager.Exceptions.RestrictedWorldException;
 import co.neweden.LandManager.LandClaim;
 import co.neweden.LandManager.LandManager;
 import co.neweden.LandManager.Listeners.MenuEvents;
@@ -102,11 +103,15 @@ public class LandCommands implements CommandExecutor {
             }
             for (LandClaim land : nearClaims) {
                 if (land.getID() != landIDfromArgs) continue;
-                if (land.claimChunk(player.getLocation().getChunk())) // access check already performed
-                    player.sendMessage(Util.formatString("&aThis chunk has been claimed and added to the land claim: &e" + land.getDisplayName()));
-                else
-                    player.sendMessage(Util.formatString("&cAn internal error has occurred while trying to claim chunk for existing claim, please contact a staff member."));
-                return;
+                try {
+                    if (land.claimChunk(player.getLocation().getChunk())) // access check already performed
+                        player.sendMessage(Util.formatString("&aThis chunk has been claimed and added to the land claim: &e" + land.getDisplayName()));
+                    else
+                        player.sendMessage(Util.formatString("&cAn internal error has occurred while trying to claim chunk for existing claim, please contact a staff member."));
+                    return;
+                } catch (RestrictedWorldException e) {
+                    player.sendMessage(Util.formatString("&c" + e.getMessage()));
+                }
             }
             player.sendMessage(Util.formatString("&cLand ID provided is not an an adjacent land claim"));
             return;
@@ -121,11 +126,15 @@ public class LandCommands implements CommandExecutor {
         // If there is just one claim nearby do this
         if (nearClaims.size() == 1) {
             LandClaim land = nearClaims.iterator().next();
-            if (land.claimChunk(player.getLocation().getChunk())) // access check already performed
-                player.sendMessage(Util.formatString("&aThis chunk has been claimed and added to the land claim: &e" + land.getDisplayName()));
-            else
-                player.sendMessage(Util.formatString("&cAn internal error has occurred while trying to claim chunk for existing claim, please contact a staff member."));
-            return;
+            try {
+                if (land.claimChunk(player.getLocation().getChunk())) // access check already performed
+                    player.sendMessage(Util.formatString("&aThis chunk has been claimed and added to the land claim: &e" + land.getDisplayName()));
+                else
+                    player.sendMessage(Util.formatString("&cAn internal error has occurred while trying to claim chunk for existing claim, please contact a staff member."));
+                return;
+            } catch (RestrictedWorldException e) {
+                player.sendMessage(Util.formatString("&c" + e.getMessage()));
+            }
         }
 
         // If there are multiple claims nearby do this
@@ -161,7 +170,11 @@ public class LandCommands implements CommandExecutor {
         }
         player.sendMessage(name);
         claim.setDisplayName(name);
-        claim.claimChunk(player.getLocation().getChunk());
+        try {
+            claim.claimChunk(player.getLocation().getChunk());
+        } catch (RestrictedWorldException e) {
+            player.sendMessage(Util.formatString("&c" + e.getMessage()));
+        }
         player.sendMessage(Util.formatString("&aThis chunk has been claimed and a new land claim was setup with the name: &e" + claim.getDisplayName()));
     }
 
