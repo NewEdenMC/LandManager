@@ -23,6 +23,7 @@ public class Main extends JavaPlugin {
         LandManager.plugin = this;
         new LandCommands();
         getServer().getPluginManager().registerEvents(new LocationEvents(), this);
+        getServer().getPluginManager().registerEvents(new InteractEvents(), this);
         getServer().getPluginManager().registerEvents(new BlockEvents(), this);
         getServer().getPluginManager().registerEvents(new MenuEvents(), this);
         startup();

@@ -7,16 +7,6 @@ import org.bukkit.event.block.*;
 public class BlockEvents implements Listener {
 
     @EventHandler
-    public void onBlockBreak(BlockBreakEvent event) {
-
-    }
-
-    @EventHandler
-    public void onBlockPlace(BlockPlaceEvent event) {
-
-    }
-
-    @EventHandler
     public void onBlockBurn(BlockBurnEvent event) {
 
     }
