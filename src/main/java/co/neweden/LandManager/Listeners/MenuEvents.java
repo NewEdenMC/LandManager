@@ -11,6 +11,7 @@ import co.neweden.menugui.menu.MenuRunnable;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.*;
@@ -19,7 +20,7 @@ public class MenuEvents implements Listener {
 
     public static Map<UUID, OfflinePlayer> landListMenuSubjects = new HashMap<>();
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onMenuPopulate(MenuPopulateEvent event) {
         MenuInstance instance = event.getMenuInstance();
         if (!instance.getMenu().equals(LandManager.getLandListMenu()))

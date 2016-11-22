@@ -9,6 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -32,27 +33,27 @@ public class InteractEvents implements Listener {
         player.updateInventory();
     }
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onPlayerInteract(PlayerInteractEvent event) {
         handleEvent(event.getClickedBlock().getLocation(), event, event.getPlayer());
     }
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onVehicleEnter(VehicleEnterEvent event) {
         handleEvent(event.getVehicle().getLocation(), event, event.getEntered());
     }
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onVehicleDestroy(VehicleDestroyEvent event) {
         handleEvent(event.getVehicle().getLocation(), event, event.getAttacker()); // event.getAttacker may sometimes be null
     }
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onPlayerShear(PlayerShearEntityEvent event) {
         handleEvent(event.getEntity().getLocation(), event, event.getPlayer());
     }
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         handleEvent(event.getEntity().getLocation(), event, event.getDamager());
     }

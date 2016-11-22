@@ -16,12 +16,6 @@ public class LocationEvents implements Listener {
     private enum EventResponse { NO_ACTION, SUCCESS, CANCELED }
 
     private EventResponse handleEvent(PlayerEvent callingEvent, Chunk fromChunk, Chunk toChunk, boolean onCancelGoToWorldSpawn) {
-        if (callingEvent instanceof Cancellable) {
-            Cancellable cancelEvent = (Cancellable) callingEvent;
-            if (cancelEvent.isCancelled())
-                return EventResponse.NO_ACTION;
-        }
-
         if (callingEvent instanceof PlayerMoveEvent) {
             PlayerMoveEvent moveEvent = (PlayerMoveEvent) callingEvent;
             if (moveEvent.getFrom().getChunk().equals(moveEvent.getTo().getChunk()))
@@ -68,17 +62,17 @@ public class LocationEvents implements Listener {
         return EventResponse.SUCCESS;
     }
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onPlayerJoin(PlayerJoinEvent event) {
         handleEvent(event, null, event.getPlayer().getLocation().getChunk(), true);
     }
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onPlayerMove(PlayerMoveEvent event) {
         handleEvent(event, event.getFrom().getChunk(), event.getTo().getChunk(), false);
     }
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         handleEvent(event, event.getFrom().getChunk(), event.getTo().getChunk(), false);
     }
