@@ -2,6 +2,7 @@ package co.neweden.LandManager;
 
 import co.neweden.LandManager.Commands.LandCommands;
 import co.neweden.LandManager.Listeners.BlockEvents;
+import co.neweden.LandManager.Listeners.InteractEvents;
 import co.neweden.LandManager.Listeners.LocationEvents;
 import co.neweden.LandManager.Listeners.MenuEvents;
 import co.neweden.menugui.MenuGUI;
@@ -122,7 +123,8 @@ public class Main extends JavaPlugin {
                 claim.homeLocation = homeLocation;
 
                 try {
-                    claim.setIconMaterial(Material.valueOf(rs.getString("icon_material")));
+                    if (rs.getString("icon_material") != null)
+                        claim.setIconMaterial(Material.valueOf(rs.getString("icon_material")));
                 } catch (IllegalArgumentException e) {
                     getLogger().log(Level.SEVERE, "Land Claim #" + land_id + ": Icon Material \"" + rs.getString("icon_material") + "\" is not valid, default value will be used instead.");
                 }
