@@ -34,7 +34,7 @@ public class InteractEvents implements Listener {
 
     @EventHandler (ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        handleEvent(event.getPlayer().getLocation(), event, event.getPlayer());
+        handleEvent(event.getClickedBlock().getLocation(), event, event.getPlayer());
     }
 
     @EventHandler (ignoreCancelled = true)
