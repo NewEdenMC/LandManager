@@ -162,7 +162,7 @@ public class LandCommands implements CommandExecutor {
             for (int i = 0; i < args.length; i++) {
                 name += args[i] + " ";
             }
-            if (name.isEmpty())
+            if (!name.isEmpty())
                 name = name.substring(0, name.length() - 1);
         }
 
