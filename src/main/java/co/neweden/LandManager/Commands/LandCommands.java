@@ -209,7 +209,7 @@ public class LandCommands implements CommandExecutor {
         if (LandManager.isChunkClaimed(player.getLocation().getChunk())) {
             LandClaim land = LandManager.getLandClaim(player.getLocation().getChunk());
 
-            if (!land.testAccessLevel(player.getUniqueId(), ACL.Level.VIEW) && !player.hasPermission("landmanager.linfo.any"))
+            if (!land.testAccessLevel(player, ACL.Level.VIEW, "landmanager.linfo.any"))
                 throw new CommandException("&cThis land is claimed but you do not have permission to view the Land Info.");
 
             status = "&aClaimed";
