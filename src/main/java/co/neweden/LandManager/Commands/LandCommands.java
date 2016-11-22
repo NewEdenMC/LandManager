@@ -110,7 +110,7 @@ public class LandCommands implements CommandExecutor {
                         player.sendMessage(Util.formatString("&cAn internal error has occurred while trying to claim chunk for existing claim, please contact a staff member."));
                     return;
                 } catch (RestrictedWorldException e) {
-                    player.sendMessage(Util.formatString("&c" + e.getMessage()));
+                    player.sendMessage(Util.formatString("&c" + e.getUserMessage()));
                 }
             }
             player.sendMessage(Util.formatString("&cLand ID provided is not an an adjacent land claim"));
@@ -133,7 +133,7 @@ public class LandCommands implements CommandExecutor {
                     player.sendMessage(Util.formatString("&cAn internal error has occurred while trying to claim chunk for existing claim, please contact a staff member."));
                 return;
             } catch (RestrictedWorldException e) {
-                player.sendMessage(Util.formatString("&c" + e.getMessage())); return;
+                player.sendMessage(Util.formatString("&c" + e.getUserMessage())); return;
             }
         }
 
