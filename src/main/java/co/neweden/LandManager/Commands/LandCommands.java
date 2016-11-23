@@ -37,6 +37,7 @@ public class LandCommands implements CommandExecutor {
         LandManager.getPlugin().getCommand("lprivate").setExecutor(this);
         LandManager.getPlugin().getCommand("lrename").setExecutor(this);
         LandManager.getPlugin().getCommand("lseticon").setExecutor(this);
+        LandManager.getPlugin().getCommand("lsethomeblock").setExecutor(this);
         LandManager.getPlugin().getCommand("listland").setExecutor(this);
     }
 
@@ -78,6 +79,7 @@ public class LandCommands implements CommandExecutor {
                 case "lprivate": privateCommand(land, player); break;
                 case "lrename": renameCommand(land, player, args); break;
                 case "lseticon": setIconCommand(land, player, args); break;
+                case "lsethomeblock": setHomeBlockCommand(land, player); break;
             }
 
         } catch (CommandException e) {
@@ -372,6 +374,16 @@ public class LandCommands implements CommandExecutor {
             player.sendMessage(Util.formatString(success));
         else
             throw new CommandException("&cAn internal error occurred while trying to set the Icon for this Land, please contact a staff member.");
+    }
+
+    private void setHomeBlockCommand(LandClaim land, Player player) {
+        if (!land.testAccessLevel(player, ACL.Level.MODIFY, "landmanager.lsethomeblock.any"))
+            throw new CommandException("&cYou do not have permission to set the Home Block for this Land.");
+
+        if (land.setHomeLocation(player.getLocation()))
+            player.sendMessage(Util.formatString("&aThe Home Block for this Land Claim has been changed to the location you are stinging in, now when using /myland players will be taken here instead of the old location."));
+        else
+            throw new CommandException("&cAn internal error occurred while trying to set the Home Block for this Land, please contact a staff member.");
     }
 
     private void listCommand(String commandLabel, Player player, String[] args) {

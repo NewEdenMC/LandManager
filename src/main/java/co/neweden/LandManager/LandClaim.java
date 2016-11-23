@@ -158,7 +158,7 @@ public class LandClaim extends ACL {
 
             if (getHomeLocation().getChunk().equals(chunk)) {
                 String consoleMessage = "Land Claim #" + id + ": Tried to unclaim chunk " + chunk + " but it contains home location, home location must not be in chunk unless it is the only chunk left in the claim.";
-                String userMessage = "This chunk can't be unclaimed as the home location for this Land Claim is in this chunk, to unclaim move the home location to another chunk in this claim, then try again.";
+                String userMessage = "This chunk can't be unclaimed as the Home Block for this Land Claim is in this chunk, to unclaim this chunk set the Home Block to another chunk in this Land Claim, then try again.";
                 throw new UnclaimChunkException(this, chunk, UnclaimChunkException.Reason.HOME_IN_CHUNK, consoleMessage, userMessage);
             }
 

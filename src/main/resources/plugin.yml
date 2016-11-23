@@ -44,6 +44,9 @@ commands:
    lseticon:
       description: Change the icon that shows up in /myland for this land, can be any Minecraft Material
       permission: landmanager.lseticon
+   lsethomeblock:
+      description: Change the location that players are teleported to when teleporting to this Land Claim
+      permission: landmanager.lsethomeblock
    listland:
       description: Displays Land that the current player or the given player has access to
       permission: landmanager.listland
@@ -68,6 +71,7 @@ permissions:
          landmanager.lprivate: true
          landmanager.lrename: true
          landmanager.lseticon: true
+         landmanager.lsethomeblock: true
          landmanager.listland: true
    landmanager.land.moderator:
       description: Gives moderator permissions to manage land
@@ -84,6 +88,7 @@ permissions:
          landmanager.lprivate.any: true
          landmanager.lrename.any: true
          landmanager.lseticon.any: true
+         landmanager.lsethomeblock.any: true
          landmanager.listland.others: true
    landmanager.claim:
       description: Permission to use /claim and /newclaim commands
@@ -127,6 +132,10 @@ permissions:
       description: Permission to use /lseticon command
    landmanager.lseticon.any:
       description: Permission to use /lseticon command regardless of ACL Level
+   landmanager.lsethomeblock:
+      description: Permission to use /lsethomeblock command
+   landmanager.lsethomeblock.any:
+      description: Permission to use /lsethomeblock command regardless of ACL Level
    landmanager.listland:
       description: Permission to use /myland and /listland command
    landmanager.listland.others:
