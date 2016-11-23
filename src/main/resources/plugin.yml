@@ -124,9 +124,9 @@ permissions:
    landmanager.lrename.any:
       description: Permission to use /lrename command regardless of ACL Level
    landmanager.lseticon:
-      description: Permission to use /licon command
+      description: Permission to use /lseticon command
    landmanager.lseticon.any:
-      description: Permission to use /licon command regardless of ACL Level
+      description: Permission to use /lseticon command regardless of ACL Level
    landmanager.listland:
       description: Permission to use /myland and /listland command
    landmanager.listland.others:
