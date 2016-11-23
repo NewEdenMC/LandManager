@@ -1,6 +1,8 @@
 package co.neweden.LandManager;
 
 import co.neweden.LandManager.Exceptions.RestrictedWorldException;
+import co.neweden.LandManager.Exceptions.UnclaimChunkException;
+import co.neweden.LandManager.Exceptions.UserException;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -142,27 +144,34 @@ public class LandClaim extends ACL {
         return true;
     }
 
-    public enum UnClaimResult { SUCCESS, SUCCESS_LAST, FAILED }
-
-    public UnClaimResult unclaimChunk(Chunk chunk) {
+    public boolean unclaimChunk(Chunk chunk) throws UnclaimChunkException {
         try {
-            PreparedStatement st = LandManager.db.prepareStatement("DELETE FROM chunks WHERE land_id=? AND x=? AND z=?;");
+            PreparedStatement st = LandManager.db.prepareStatement("SELECT COUNT(*) FROM chunks WHERE land_id=?");
+            st.setInt(1, id);
+            ResultSet rs = st.executeQuery();
+            rs.next();
+            if (rs.getInt(1) <= 1) {
+                String consoleMessage = "Land Claim #" + id + ": Tried to unclaim chunk " + chunk + " but it is the last chunk in this Land Claim, Land Claim cannot contain no chunks, Land Claim should be deleted or another chunk claimed before  this one is unclaimed.";
+                String userMessage = "This chunk can't be unclaimed as it is the last chunk in this Land Claim, either claim a new chunk for this Claim then try again, or delete this Land Claim.";
+                throw new UnclaimChunkException(this, chunk, UnclaimChunkException.Reason.LAST_CHUNK, consoleMessage, userMessage);
+            }
+
+            if (getHomeLocation().getChunk().equals(chunk)) {
+                String consoleMessage = "Land Claim #" + id + ": Tried to unclaim chunk " + chunk + " but it contains home location, home location must not be in chunk unless it is the only chunk left in the claim.";
+                String userMessage = "This chunk can't be unclaimed as the home location for this Land Claim is in this chunk, to unclaim move the home location to another chunk in this claim, then try again.";
+                throw new UnclaimChunkException(this, chunk, UnclaimChunkException.Reason.HOME_IN_CHUNK, consoleMessage, userMessage);
+            }
+
+            st = LandManager.db.prepareStatement("DELETE FROM chunks WHERE land_id=? AND x=? AND z=?;");
             st.setInt(1, id);
             st.setInt(2, chunk.getX());
             st.setInt(3, chunk.getZ());
             st.executeUpdate();
-
-            st = LandManager.db.prepareStatement("SELECT chunk_id FROM chunks WHERE land_id=?");
-            st.setInt(1, id);
-            ResultSet rs = st.executeQuery();
-            if (rs.isBeforeFirst())
-                return UnClaimResult.SUCCESS;
-            else
-                return UnClaimResult.SUCCESS_LAST;
         } catch (SQLException e) {
             LandManager.getPlugin().getLogger().log(java.util.logging.Level.SEVERE, "An SQL Exception occurred while trying to un-claim chunk \"" + chunk + "\" for land claim " + id + " (\"" + displayName + "\").", e);
-            return UnClaimResult.FAILED;
+            return false;
         }
+        return true;
     }
 
     public boolean setAccess(UUID uuid, Level level) {

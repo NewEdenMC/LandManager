@@ -7,7 +7,7 @@ public class UnclaimChunkException extends UserException {
 
     private LandClaim land;
     private Chunk chunk;
-    public enum Reason { HOME_IN_CHUNK }
+    public enum Reason { LAST_CHUNK, HOME_IN_CHUNK }
     private Reason cause;
 
     public UnclaimChunkException(LandClaim land, Chunk chunk, Reason cause, String consoleMessage, String userMessage) {

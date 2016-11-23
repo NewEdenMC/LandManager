@@ -2,6 +2,7 @@ package co.neweden.LandManager.Commands;
 
 import co.neweden.LandManager.ACL;
 import co.neweden.LandManager.Exceptions.RestrictedWorldException;
+import co.neweden.LandManager.Exceptions.UnclaimChunkException;
 import co.neweden.LandManager.LandClaim;
 import co.neweden.LandManager.LandManager;
 import co.neweden.LandManager.Listeners.MenuEvents;
@@ -183,18 +184,19 @@ public class LandCommands implements CommandExecutor {
         if (!land.testAccessLevel(player, ACL.Level.FULL_ACCESS, "landmanager.unclaim.any"))
             throw new CommandException("&cYou do not have permission to unclaim this chunk.");
 
-        LandClaim.UnClaimResult unclaimResult = land.unclaimChunk(player.getLocation().getChunk());
+        String message = "&aChunk successfully un-claimed";
 
-        String message = "";
-        switch (unclaimResult) {
-            case FAILED: message = "&cAn internal error has occurred while trying to un-claim this chunk, please contact a staff member."; break;
-            case SUCCESS: message = "&aChunk successfully un-claimed"; break;
-            case SUCCESS_LAST:
+        try {
+            if (!land.unclaimChunk(player.getLocation().getChunk()))
+                message = "&cAn internal error has occurred while trying to un-claim this chunk, please contact a staff member.";
+        } catch (UnclaimChunkException e) {
+            if (e.getReason().equals(UnclaimChunkException.Reason.LAST_CHUNK)) {
                 if (LandManager.deleteClaim(land))
-                    message = "&aChunk successfully un-claimed, &eAs this was the last chunk in the land claim the land claim has been deleted";
+                    message += "&e as this was the last chunk in the land claim the land claim has been deleted";
                 else
                     message = "&cChunk was successfully un-claimed, as it was the last chunk in the Land Claim should have been deleted however an internal error occurred, please contact a staff members.";
-                break;
+            } else
+                message = "&c" + e.getUserMessage();
         }
 
         player.sendMessage(Util.formatString(message));
