@@ -23,4 +23,6 @@ public class RestrictedWorldException extends Exception {
 
     public String getConsoleMessage() { return getMessage(); }
 
+    public World getWorld() { return world; }
+
 }
