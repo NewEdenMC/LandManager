@@ -2,26 +2,20 @@ package co.neweden.LandManager.Exceptions;
 
 import org.bukkit.World;
 
-public class RestrictedWorldException extends Exception {
+public class RestrictedWorldException extends UserException {
 
     private World world;
-    private String userMessage;
 
     public RestrictedWorldException(World world, String consoleMessage, String userMessage) {
-        super(consoleMessage);
+        super(consoleMessage, userMessage);
         this.world = world;
-        this.userMessage = userMessage;
     }
 
     public RestrictedWorldException(World world, String message) { this(world, message, message); }
 
-    public RestrictedWorldException(Throwable cause) {
+    public RestrictedWorldException(RestrictedWorldException cause) {
         super(cause);
     }
-
-    public String getUserMessage() { return userMessage; }
-
-    public String getConsoleMessage() { return getMessage(); }
 
     public World getWorld() { return world; }
 
