@@ -36,7 +36,7 @@ public class LandCommands implements CommandExecutor {
         LandManager.getPlugin().getCommand("lpublic").setExecutor(this);
         LandManager.getPlugin().getCommand("lprivate").setExecutor(this);
         LandManager.getPlugin().getCommand("lrename").setExecutor(this);
-        LandManager.getPlugin().getCommand("licon").setExecutor(this);
+        LandManager.getPlugin().getCommand("lseticon").setExecutor(this);
         LandManager.getPlugin().getCommand("listland").setExecutor(this);
     }
 
@@ -77,7 +77,7 @@ public class LandCommands implements CommandExecutor {
                 case "lpublic": publicCommand(land, player, args); break;
                 case "lprivate": privateCommand(land, player); break;
                 case "lrename": renameCommand(land, player, args); break;
-                case "licon": iconCommand(land, player, args); break;
+                case "lseticon": setIconCommand(land, player, args); break;
             }
 
         } catch (CommandException e) {
@@ -349,7 +349,7 @@ public class LandCommands implements CommandExecutor {
             throw new CommandException("&cAn internal error occurred while trying to set the name for this Land, please contact a staff member.");
     }
 
-    private void iconCommand(LandClaim land, Player player, String[] args) {
+    private void setIconCommand(LandClaim land, Player player, String[] args) {
         if (!land.testAccessLevel(player, ACL.Level.MODIFY, "landmanager.licon.any"))
             throw new CommandException("&cYou do not have permission to set the icon for this Land.");
 

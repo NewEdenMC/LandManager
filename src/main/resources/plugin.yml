@@ -41,9 +41,9 @@ commands:
    lrename:
       description: Change the name that shows up in /myland for this land, name can have spaces
       permission: landmanager.lrename
-   licon:
+   lseticon:
       description: Change the icon that shows up in /myland for this land, can be any Minecraft Material
-      permission: landmanager.licon
+      permission: landmanager.lseticon
    listland:
       description: Displays Land that the current player or the given player has access to
       permission: landmanager.listland
@@ -67,7 +67,7 @@ permissions:
          landmanager.lpublic: true
          landmanager.lprivate: true
          landmanager.lrename: true
-         landmanager.licon: true
+         landmanager.lseticon: true
          landmanager.listland: true
    landmanager.land.moderator:
       description: Gives moderator permissions to manage land
@@ -83,7 +83,7 @@ permissions:
          landmanager.lpublic.any: true
          landmanager.lprivate.any: true
          landmanager.lrename.any: true
-         landmanager.licon.any: true
+         landmanager.lseticon.any: true
          landmanager.listland.others: true
    landmanager.claim:
       description: Permission to use /claim and /newclaim commands
@@ -123,9 +123,9 @@ permissions:
       description: Permission to use /lrename command
    landmanager.lrename.any:
       description: Permission to use /lrename command regardless of ACL Level
-   landmanager.licon:
+   landmanager.lseticon:
       description: Permission to use /licon command
-   landmanager.licon.any:
+   landmanager.lseticon.any:
       description: Permission to use /licon command regardless of ACL Level
    landmanager.listland:
       description: Permission to use /myland and /listland command
