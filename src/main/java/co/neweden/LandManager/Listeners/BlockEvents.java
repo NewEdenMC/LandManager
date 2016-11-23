@@ -34,7 +34,6 @@ public class BlockEvents implements Listener {
         blockList.stream().forEach(
                 e -> land.add(LandManager.getLandClaim(e.getChunk()))
         );
-        System.out.print("list: " + land);
         if (land.size() > 1)
             event.setCancelled(true);
     }
