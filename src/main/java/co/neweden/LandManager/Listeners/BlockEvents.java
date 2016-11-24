@@ -2,9 +2,7 @@ package co.neweden.LandManager.Listeners;
 
 import co.neweden.LandManager.LandClaim;
 import co.neweden.LandManager.LandManager;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import co.neweden.LandManager.Util;
 import org.bukkit.block.Block;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
@@ -15,6 +13,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 public class BlockEvents implements Listener {
 
@@ -36,6 +35,15 @@ public class BlockEvents implements Listener {
         );
         if (land.size() > 1)
             event.setCancelled(true);
+    }
+
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
+    public void onBlockMultiPlace(BlockMultiPlaceEvent event) {
+        Collection<Block> blocks = new HashSet<>();
+        event.getReplacedBlockStates().forEach(e -> blocks.add(e.getBlock()));
+        handleCheckLandBorders(event, blocks);
+        if (event.isCancelled())
+            event.getPlayer().sendMessage(Util.formatString("&cYou can't place blocks which cross a land border."));
     }
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
