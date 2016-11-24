@@ -11,6 +11,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
@@ -56,6 +57,11 @@ public class InteractEvents implements Listener {
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         handleEvent(event.getEntity().getLocation(), event, event.getDamager());
+    }
+
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
+    public void onSignChange(SignChangeEvent event) {
+        handleEvent(event.getBlock().getLocation(), event, event.getPlayer());
     }
 
 }
