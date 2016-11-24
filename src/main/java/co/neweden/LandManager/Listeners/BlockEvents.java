@@ -7,11 +7,13 @@ import co.neweden.LandManager.Util;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
+import org.bukkit.event.entity.EntityBreakDoorEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
 import java.util.Collection;
@@ -71,5 +73,14 @@ public class BlockEvents implements Listener {
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockPistonRetract(BlockPistonRetractEvent event) { handleCheckLandBorders(event, event.getBlocks()); }
+
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
+    public void onEntityBreakDoor(EntityBreakDoorEvent event) {
+        if (event.getEntity() instanceof Player) return;
+        LandClaim land = LandManager.getLandClaim(event.getBlock().getLocation().getChunk());
+        if (land == null) return;
+        if (!ACL.testAccessLevel(land.getEveryoneAccessLevel(), ACL.Level.INTERACT))
+            event.setCancelled(true);
+    }
 
 }
