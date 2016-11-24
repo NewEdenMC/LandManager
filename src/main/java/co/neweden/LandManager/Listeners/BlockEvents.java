@@ -40,10 +40,12 @@ public class BlockEvents implements Listener {
     private void handleCheckLandBorders(Cancellable event, Collection<Chunk> chunks, Player feedbackToPlayer) {
         Collection<LandClaim> found = chunks.stream().map(LandManager::getLandClaim).collect(Collectors.toSet());
         if (found.size() <= 1) return; // we use Set.size() instead of the Lambda count() as we can take advantage of Sets ability to group/override duplicate values for us
-        event.setCancelled(true);
         if (feedbackToPlayer != null) {
+            if (found.contains(null)) found.remove(null); // chunks with no land claims are group under null, this prevents an NPE on next line
+            if (found.stream().filter(e -> e.testAccessLevel(feedbackToPlayer, ACL.Level.INTERACT, "landmanager.land.interactany")).count() == found.size()) return;
             feedbackToPlayer.sendMessage(Util.formatString("&cIt is not possible to perform this action, you are to close to a Land border."));
         }
+        event.setCancelled(true);
     }
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
