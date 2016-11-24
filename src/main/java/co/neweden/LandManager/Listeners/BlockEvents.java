@@ -29,7 +29,7 @@ public class BlockEvents implements Listener {
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockFromTo(BlockFromToEvent event) { handleBlockMove(event, event.getBlock(), event.getToBlock()); }
 
-    private void handleBlockExplosion(Cancellable event, Collection<Block> blockList) {
+    private void handleCheckLandBorders(Cancellable event, Collection<Block> blockList) {
         Collection<LandClaim> land = new HashSet<>();
         blockList.stream().forEach(
                 e -> land.add(LandManager.getLandClaim(e.getChunk()))
@@ -39,10 +39,10 @@ public class BlockEvents implements Listener {
     }
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
-    public void onBlockExplode(BlockExplodeEvent event) { handleBlockExplosion(event, event.blockList()); }
+    public void onBlockExplode(BlockExplodeEvent event) { handleCheckLandBorders(event, event.blockList()); }
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
-    public void onEntityExplode(EntityExplodeEvent event) { handleBlockExplosion(event, event.blockList()); }
+    public void onEntityExplode(EntityExplodeEvent event) { handleCheckLandBorders(event, event.blockList()); }
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockPistonRetract(BlockPistonRetractEvent event) {
