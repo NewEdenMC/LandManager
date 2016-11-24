@@ -4,7 +4,9 @@ import co.neweden.LandManager.ACL;
 import co.neweden.LandManager.LandClaim;
 import co.neweden.LandManager.LandManager;
 import co.neweden.LandManager.Util;
+import org.bukkit.Chunk;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -15,9 +17,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 public class BlockEvents implements Listener {
 
@@ -32,26 +36,23 @@ public class BlockEvents implements Listener {
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockFromTo(BlockFromToEvent event) { handleBlockMove(event, event.getBlock(), event.getToBlock()); }
 
-    private void handleCheckLandBorders(Cancellable event, Collection<Block> blockList) {
-        Collection<LandClaim> land = new HashSet<>();
-        blockList.stream().forEach(
-                e -> land.add(LandManager.getLandClaim(e.getChunk()))
-        );
-        if (land.size() > 1)
-            event.setCancelled(true);
+    private void handleCheckLandBorders(Cancellable event, Collection<Chunk> chunks) { handleCheckLandBorders(event, chunks, null);}
+    private void handleCheckLandBorders(Cancellable event, Collection<Chunk> chunks, Player feedbackToPlayer) {
+        Collection<LandClaim> found = chunks.stream().map(LandManager::getLandClaim).collect(Collectors.toSet());
+        if (found.size() <= 1) return; // we use Set.size() instead of the Lambda count() as we can take advantage of Sets ability to group/override duplicate values for us
+        event.setCancelled(true);
+        if (feedbackToPlayer != null) {
+            feedbackToPlayer.sendMessage(Util.formatString("&cIt is not possible to perform this action, you are to close to a Land border."));
+        }
     }
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockMultiPlace(BlockMultiPlaceEvent event) {
-        Collection<Block> blocks = new HashSet<>();
-        event.getReplacedBlockStates().forEach(e -> blocks.add(e.getBlock()));
-        handleCheckLandBorders(event, blocks);
-        if (event.isCancelled())
-            event.getPlayer().sendMessage(Util.formatString("&cYou can't place blocks which cross a land border."));
+        handleCheckLandBorders(event, event.getReplacedBlockStates().stream().map(BlockState::getChunk).collect(Collectors.toSet()), event.getPlayer());
     }
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
-    public void onBlockExplode(BlockExplodeEvent event) { handleCheckLandBorders(event, event.blockList()); }
+    public void onBlockExplode(BlockExplodeEvent event) { handleCheckLandBorders(event, event.blockList().stream().map(Block::getChunk).collect(Collectors.toSet())); }
 
     private void handleEntityExplosions(Cancellable event, Entity explodingEntity) {
         if (event.isCancelled() || !(explodingEntity instanceof LivingEntity)) return;
@@ -64,15 +65,15 @@ public class BlockEvents implements Listener {
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onEntityExplode(EntityExplodeEvent event) {
-        handleCheckLandBorders(event, event.blockList());
+        handleCheckLandBorders(event, event.blockList().stream().map(Block::getChunk).collect(Collectors.toSet()));
         handleEntityExplosions(event, event.getEntity());
     }
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
-    public void onBlockPistonExtend(BlockPistonExtendEvent event) { handleCheckLandBorders(event, event.getBlocks()); }
+    public void onBlockPistonExtend(BlockPistonExtendEvent event) { handleCheckLandBorders(event, event.getBlocks().stream().map(Block::getChunk).collect(Collectors.toSet())); }
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
-    public void onBlockPistonRetract(BlockPistonRetractEvent event) { handleCheckLandBorders(event, event.getBlocks()); }
+    public void onBlockPistonRetract(BlockPistonRetractEvent event) { handleCheckLandBorders(event, event.getBlocks().stream().map(Block::getChunk).collect(Collectors.toSet())); }
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onEntityBreakDoor(EntityBreakDoorEvent event) {
