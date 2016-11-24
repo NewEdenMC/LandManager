@@ -45,13 +45,9 @@ public class BlockEvents implements Listener {
     public void onEntityExplode(EntityExplodeEvent event) { handleCheckLandBorders(event, event.blockList()); }
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
-    public void onBlockPistonRetract(BlockPistonRetractEvent event) {
-
-    }
+    public void onBlockPistonExtend(BlockPistonExtendEvent event) { handleCheckLandBorders(event, event.getBlocks()); }
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
-    public void onBlockPistonExtend(BlockPistonExtendEvent event) {
-
-    }
+    public void onBlockPistonRetract(BlockPistonRetractEvent event) { handleCheckLandBorders(event, event.getBlocks()); }
 
 }
