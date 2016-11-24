@@ -84,4 +84,9 @@ public class BlockEvents implements Listener {
             event.setCancelled(true);
     }
 
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
+    public void onStructureGrow(StructureGrowEvent event) {
+        handleCheckLandBorders(event, event.getBlocks().stream().map(BlockState::getChunk).collect(Collectors.toSet()), event.getPlayer());
+    }
+
 }
