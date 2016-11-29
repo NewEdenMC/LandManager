@@ -1,8 +1,10 @@
 package co.neweden.LandManager.Commands;
 
 import co.neweden.LandManager.ACL;
+import co.neweden.LandManager.Exceptions.LandClaimLimitReachedException;
 import co.neweden.LandManager.Exceptions.RestrictedWorldException;
 import co.neweden.LandManager.Exceptions.UnclaimChunkException;
+import co.neweden.LandManager.Exceptions.UserException;
 import co.neweden.LandManager.LandClaim;
 import co.neweden.LandManager.LandManager;
 import co.neweden.LandManager.Listeners.MenuEvents;
@@ -177,7 +179,7 @@ public class LandCommands implements CommandExecutor {
             claim.setDisplayName(name);
             claim.claimChunk(player.getLocation().getChunk());
             player.sendMessage(Util.formatString("&aThis chunk has been claimed and a new land claim was setup with the name: &e" + claim.getDisplayName()));
-        } catch (RestrictedWorldException e) {
+        } catch (UserException e) {
             throw new CommandException("&c" + e.getUserMessage());
         }
     }
@@ -248,8 +250,10 @@ public class LandCommands implements CommandExecutor {
         if (toPlayer == null)
             throw new CommandException("&cPlayer \"" + args[0] + "\"not found.");
 
-        if (!land.setOwner(toPlayer.getUniqueId()) || !land.setAccess(player.getUniqueId(), ACL.Level.MODIFY))
-            throw new CommandException("&cAn internal error occurred while trying to transfer ownership of the Land, please contact a staff member.");
+        try {
+            if (!land.setOwner(toPlayer.getUniqueId()) || !land.setAccess(player.getUniqueId(), ACL.Level.MODIFY))
+                throw new CommandException("&cAn internal error occurred while trying to transfer ownership of the Land, please contact a staff member.");
+        } catch (UserException e) { player.sendMessage(Util.formatString("&c" + e.getUserMessage())); }
 
         player.sendMessage(Util.formatString("&aYou have successfully transferred ownership of Land &e" + land.getDisplayName() + "&a to &e" + toPlayer.getName()));
     }

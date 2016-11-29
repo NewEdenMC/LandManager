@@ -1,5 +1,6 @@
 package co.neweden.LandManager;
 
+import co.neweden.LandManager.Exceptions.LandClaimLimitReachedException;
 import co.neweden.LandManager.Exceptions.RestrictedWorldException;
 import co.neweden.LandManager.Exceptions.UnclaimChunkException;
 import co.neweden.LandManager.Exceptions.UserException;
@@ -79,7 +80,10 @@ public class LandClaim extends ACL {
 
     public UUID getOwner() { return owner; }
 
-    public boolean setOwner(UUID uuid) {
+    public boolean setOwner(UUID uuid) throws LandClaimLimitReachedException {
+        if (!LandManager.canPlayerClaimMoreLand(uuid))
+            throw new LandClaimLimitReachedException(this, uuid, "Cannot set owner for Land Claim #" + id + " to Player " + uuid + " as the Player has reached their Land Claim Limit.", "Unable to set the owner for this Land Claim as they have reached their Land Claim Limit.");
+
         if (setDBValue("owner", uuid.toString())) {
             owner = uuid;
             return true;

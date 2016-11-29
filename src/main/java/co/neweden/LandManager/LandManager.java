@@ -1,5 +1,6 @@
 package co.neweden.LandManager;
 
+import co.neweden.LandManager.Exceptions.LandClaimLimitReachedException;
 import co.neweden.LandManager.Exceptions.RestrictedWorldException;
 import co.neweden.menugui.menu.Menu;
 import org.bukkit.Chunk;
@@ -46,7 +47,7 @@ public class LandManager {
         return (getLandClaim(chunk) != null);
     }
 
-    public static LandClaim createClaim(UUID owner, Location homeLocation) throws RestrictedWorldException {
+    public static LandClaim createClaim(UUID owner, Location homeLocation) throws RestrictedWorldException, LandClaimLimitReachedException {
         try {
             PreparedStatement st = LandManager.db.prepareStatement("INSERT INTO `landclaims` (`owner`, `home_location`) VALUES (?, ?);", Statement.RETURN_GENERATED_KEYS);
             st.setString(1, owner.toString());
@@ -54,6 +55,9 @@ public class LandManager {
             st.executeUpdate();
             ResultSet rs = st.getGeneratedKeys();
             rs.next();
+
+            if (!LandManager.canPlayerClaimMoreLand(owner))
+                throw new LandClaimLimitReachedException(null, owner, "Cannot create a new Land Claim for Player " + owner + " as the Player has reached their Land Claim Limit.", "Unable to create a new Land Claim as you have reached your Land Claim Limit.");
 
             if (LandManager.isWorldRestricted(homeLocation.getWorld()))
                 throw new RestrictedWorldException(homeLocation.getWorld(), "Unable to create Land Claim in this World as it is restricted by the configuration.", "You are not allowed to create a Land Claim in this world.");
@@ -137,6 +141,19 @@ public class LandManager {
             return false;
         }
         return true;
+    }
+
+    public static boolean canPlayerClaimMoreLand(UUID playerUUID) {
+        long claims = LandManager.getLandClaims().stream().filter(e -> e.getOwner().equals(playerUUID)).count();
+        int limit = LandManager.getLandClaimLimit(playerUUID);
+        if (limit == -1 && claims < limit)
+            return true;
+        else
+            return false;
+    }
+
+    public static int getLandClaimLimit(UUID playerUUID) {
+        return -1;
     }
 
 }
