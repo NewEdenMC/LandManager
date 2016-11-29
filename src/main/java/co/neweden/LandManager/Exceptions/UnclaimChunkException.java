@@ -19,9 +19,7 @@ public class UnclaimChunkException extends UserException {
 
     public UnclaimChunkException(LandClaim land, Chunk chunk, Reason cause, String message) { this(land, chunk, cause, message, message); }
 
-    public UnclaimChunkException(UnclaimChunkException cause) {
-        super(cause);
-    }
+    public UnclaimChunkException(UnclaimChunkException cause) { super(cause); }
 
     public LandClaim getLandClaim() { return land; }
 

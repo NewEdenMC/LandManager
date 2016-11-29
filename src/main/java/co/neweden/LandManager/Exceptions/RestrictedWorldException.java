@@ -13,9 +13,7 @@ public class RestrictedWorldException extends UserException {
 
     public RestrictedWorldException(World world, String message) { this(world, message, message); }
 
-    public RestrictedWorldException(RestrictedWorldException cause) {
-        super(cause);
-    }
+    public RestrictedWorldException(RestrictedWorldException cause) { super(cause); }
 
     public World getWorld() { return world; }
 
