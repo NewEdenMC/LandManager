@@ -27,7 +27,7 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InteractEvents(), this);
         getServer().getPluginManager().registerEvents(new BlockEvents(), this);
         getServer().getPluginManager().registerEvents(new MenuEvents(), this);
-        startup();
+        if (!startup()) getServer().getPluginManager().disablePlugin(this);
     }
 
     private boolean startup() {
