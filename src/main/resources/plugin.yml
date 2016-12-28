@@ -52,12 +52,18 @@ commands:
       permission: landmanager.listland
       usage: /listland [PLAYER_NAME]
       aliases: myland
+   rtp:
+      description: Teleports you to a random location
+      permission: landmanager.rtp
+      aliases: [randomtp, random, wild, wilderness]
 permissions:
    landmanager.*:
       description: Gives all LandManager permission nodes
       default: op
       children:
          landmanager.land.moderator: true
+   landmanager.rtp:
+      description: Permission to use /rtp command
    landmanager.land:
       description: Gives player permissions to claim and use Land
       children:

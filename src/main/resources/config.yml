@@ -8,3 +8,9 @@ mysql:
 land_claims:
    restricted_worlds_mode: whitelist
    restricted_worlds_list: []
+
+random_tp:
+   default_radius: 1000
+   worlds:
+      melonWorld: 500
+    pass_limit: 100

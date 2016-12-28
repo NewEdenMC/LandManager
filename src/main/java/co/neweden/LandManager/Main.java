@@ -1,6 +1,7 @@
 package co.neweden.LandManager;
 
 import co.neweden.LandManager.Commands.LandCommands;
+import co.neweden.LandManager.Commands.UtilCommands;
 import co.neweden.LandManager.Listeners.BlockEvents;
 import co.neweden.LandManager.Listeners.InteractEvents;
 import co.neweden.LandManager.Listeners.LocationEvents;
@@ -21,7 +22,7 @@ public class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         LandManager.plugin = this;
-        new LandCommands();
+        new UtilCommands(); new LandCommands();
         getServer().getPluginManager().registerEvents(new LocationEvents(), this);
         getServer().getPluginManager().registerEvents(new InteractEvents(), this);
         getServer().getPluginManager().registerEvents(new BlockEvents(), this);
