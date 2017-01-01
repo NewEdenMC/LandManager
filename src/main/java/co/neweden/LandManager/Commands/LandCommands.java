@@ -238,7 +238,7 @@ public class LandCommands implements CommandExecutor {
         ));
     }
 
-    public void transferCommand(LandClaim land, Player player, String[] args) {
+    private void transferCommand(LandClaim land, Player player, String[] args) {
         if (!land.testAccessLevel(player, ACL.Level.FULL_ACCESS, "landmanager.ltransfer.any"))
             throw new CommandException("&cYou do not have permission to transfer this Land to another player.");
 
