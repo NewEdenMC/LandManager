@@ -2,10 +2,7 @@ package co.neweden.LandManager;
 
 import co.neweden.LandManager.Commands.LandCommands;
 import co.neweden.LandManager.Commands.UtilCommands;
-import co.neweden.LandManager.Listeners.BlockEvents;
-import co.neweden.LandManager.Listeners.InteractEvents;
-import co.neweden.LandManager.Listeners.LocationEvents;
-import co.neweden.LandManager.Listeners.MenuEvents;
+import co.neweden.LandManager.Listeners.*;
 import co.neweden.menugui.MenuGUI;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,6 +24,7 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InteractEvents(), this);
         getServer().getPluginManager().registerEvents(new BlockEvents(), this);
         getServer().getPluginManager().registerEvents(new MenuEvents(), this);
+        getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
         if (!startup()) getServer().getPluginManager().disablePlugin(this);
     }
 
@@ -34,6 +32,7 @@ public class Main extends JavaPlugin {
         saveDefaultConfig();
         if (!loadDBConnection() || !setupDB() || !loadClaims() || !setupMenu())
             return false;
+        getServer().getOnlinePlayers().forEach(LandManager::updatePlayerCache);
         return true;
     }
 
@@ -86,6 +85,13 @@ public class Main extends JavaPlugin {
                     "  `x` INT NOT NULL,\n" +
                     "  `z` INT NOT NULL,\n" +
                     "  PRIMARY KEY (`chunk_id`)\n" +
+                    ");\n"
+            );
+            LandManager.db.createStatement().execute(
+                    "CREATE TABLE IF NOT EXISTS `players` (\n" +
+                    "  `uuid` VARCHAR(36) NOT NULL,\n" +
+                    "  `claim_limit_cache` INT NOT NULL,\n" +
+                    "  PRIMARY KEY (`uuid`)\n" +
                     ");\n"
             );
         } catch (SQLException e) {

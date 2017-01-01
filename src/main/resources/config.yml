@@ -8,6 +8,7 @@ mysql:
 land_claims:
    restricted_worlds_mode: whitelist
    restricted_worlds_list: []
+   default_claim_limit_per_player: 3
 
 random_tp:
    default_radius: 1000

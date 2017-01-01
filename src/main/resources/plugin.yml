@@ -98,6 +98,8 @@ permissions:
          landmanager.listland.others: true
    landmanager.claim:
       description: Permission to use /claim and /newclaim commands
+   landmanager.claimlimit.unlimited:
+      description: No limit on number of Land Claims, replace "unlimited" with a number to assign that limit to the player
    landmanager.unclaim:
       description: Permission to use /unclaim command
    landmanager.unclaim.any:

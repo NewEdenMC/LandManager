@@ -6,10 +6,13 @@ import co.neweden.menugui.menu.Menu;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class LandManager {
 
@@ -57,7 +60,7 @@ public class LandManager {
             rs.next();
 
             if (!LandManager.canPlayerClaimMoreLand(owner))
-                throw new LandClaimLimitReachedException(null, owner, "Cannot create a new Land Claim for Player " + owner + " as the Player has reached their Land Claim Limit.", "Unable to create a new Land Claim as you have reached your Land Claim Limit.");
+                throw new LandClaimLimitReachedException(null, owner, "Cannot create a new Land Claim for Player " + owner + " as the Player has reached their Land Claim Limit, limit: " + getLandClaimLimit(owner), "Unable to create a new Land Claim as you have reached your Land Claim Limit of " + getLandClaimLimit(owner) + " Land Claims.");
 
             if (LandManager.isWorldRestricted(homeLocation.getWorld()))
                 throw new RestrictedWorldException(homeLocation.getWorld(), "Unable to create Land Claim in this World as it is restricted by the configuration.", "You are not allowed to create a Land Claim in this world.");
@@ -146,14 +149,55 @@ public class LandManager {
     public static boolean canPlayerClaimMoreLand(UUID playerUUID) {
         long claims = LandManager.getLandClaims().stream().filter(e -> e.getOwner().equals(playerUUID)).count();
         int limit = LandManager.getLandClaimLimit(playerUUID);
-        if (limit == -1 && claims < limit)
-            return true;
-        else
-            return false;
+        return (limit == -1 || claims <= limit);
     }
 
     public static int getLandClaimLimit(UUID playerUUID) {
-        return -1;
+        try {
+            PreparedStatement st = getDB().prepareStatement("SELECT claim_limit_cache FROM players WHERE uuid=?");
+            st.setString(1, playerUUID.toString());
+            ResultSet rs = st.executeQuery();
+            if (rs.next())
+                return rs.getInt("claim_limit_cache");
+        } catch (SQLException e) {
+            getPlugin().getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to get claim_limit_cache value for UUID: " + playerUUID);
+        }
+        return getPlugin().getConfig().getInt("land_claims.default_claim_limit_per_player", -1);
+    }
+
+    public static void updatePlayerCache(Player player) {
+        int limit = -2;
+        if (player.hasPermission("landmanager.claimlimit.unlimited"))
+            limit = -1;
+        else {
+            for (PermissionAttachmentInfo permInfo : player.getEffectivePermissions()) {
+                String perm = permInfo.getPermission();
+
+                if (perm.length() < 23) continue;
+                System.out.print(perm);
+                if (!perm.substring(0, 23).equalsIgnoreCase("landmanager.claimlimit.")) continue;
+                System.out.print(perm);
+
+                try {
+                    int plimit = Integer.parseInt(perm.substring(23));
+                    if (plimit > limit) limit = plimit;
+                } catch (NumberFormatException ex) { continue; }
+            }
+        }
+
+        try {
+            PreparedStatement st;
+            if (limit == -2)
+                st = LandManager.getDB().prepareStatement("DELETE FROM players WHERE uuid = ?");
+            else {
+                st = LandManager.getDB().prepareStatement("INSERT INTO players (uuid, claim_limit_cache) VALUES (?,?) ON DUPLICATE KEY UPDATE claim_limit_cache=?");
+                st.setInt(2, limit); st.setInt(3, limit);
+            }
+            st.setString(1, player.getUniqueId().toString());
+            st.executeUpdate();
+        } catch (SQLException e) {
+            LandManager.getPlugin().getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to insert/update player claim_limit_cache for uuid: " + player.getUniqueId(), e);
+        }
     }
 
 }

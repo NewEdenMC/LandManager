@@ -82,7 +82,7 @@ public class LandClaim extends ACL {
 
     public boolean setOwner(UUID uuid) throws LandClaimLimitReachedException {
         if (!LandManager.canPlayerClaimMoreLand(uuid))
-            throw new LandClaimLimitReachedException(this, uuid, "Cannot set owner for Land Claim #" + id + " to Player " + uuid + " as the Player has reached their Land Claim Limit.", "Unable to set the owner for this Land Claim as they have reached their Land Claim Limit.");
+            throw new LandClaimLimitReachedException(this, uuid, "Cannot set owner for Land Claim #" + id + " to Player " + uuid + " as the Player has reached their Land Claim Limit, limit: " + LandManager.getLandClaimLimit(getOwner()), "Unable to set the owner for this Land Claim as they have reached their Land Claim Limit.");
 
         if (setDBValue("owner", uuid.toString())) {
             owner = uuid;
