@@ -163,12 +163,14 @@ public class LandCommands implements CommandExecutor {
     private void createNewClaim(Player player, String[] args) {
         String name = null;
         if (args != null) {
-            name = "";
-            for (int i = 0; i < args.length; i++) {
-                name += args[i] + " ";
+            if (args.length > 0) {
+                name = "";
+                for (int i = 0; i < args.length; i++) {
+                    name += args[i] + " ";
+                }
+                if (!name.isEmpty())
+                    name = name.substring(0, name.length() - 1);
             }
-            if (!name.isEmpty())
-                name = name.substring(0, name.length() - 1);
         }
 
         try {
