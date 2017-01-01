@@ -194,15 +194,17 @@ public class LandCommands implements CommandExecutor {
 
         try {
             if (!land.unclaimChunk(player.getLocation().getChunk()))
-                message = "&cAn internal error has occurred while trying to un-claim this chunk, please contact a staff member.";
+                throw new CommandException("&cAn internal error has occurred while trying to un-claim this chunk, please contact a staff member.");
+
         } catch (UnclaimChunkException e) {
-            if (e.getReason().equals(UnclaimChunkException.Reason.LAST_CHUNK)) {
-                if (LandManager.deleteClaim(land))
-                    message += "&e as this was the last chunk in the land claim the land claim has been deleted";
-                else
-                    message = "&cChunk was successfully un-claimed, as it was the last chunk in the Land Claim should have been deleted however an internal error occurred, please contact a staff members.";
-            } else
-                message = "&c" + e.getUserMessage();
+
+            if (!e.getReason().equals(UnclaimChunkException.Reason.LAST_CHUNK))
+                throw new CommandException("&c" + e.getUserMessage());
+
+            if (!LandManager.deleteClaim(land))
+                throw new CommandException("&cChunk was un-claimed and as it was the last chunk in the Land Claim, the Claim should have been deleted however an internal error occurred, please contact a staff members.");
+
+            message += "&e as this was the last chunk in the land claim the land claim has been deleted";
         }
 
         player.sendMessage(Util.formatString(message));
