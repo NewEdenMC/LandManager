@@ -65,6 +65,13 @@ public class BlockEvents implements Listener {
             event.setCancelled(true);
     }
 
+    private void handleEveryoneAccessCheck(Cancellable event, Chunk chunk) {
+        LandClaim land = LandManager.getLandClaim(chunk);
+        if (land == null) return;
+        if (!ACL.testAccessLevel(land.getEveryoneAccessLevel(), ACL.Level.INTERACT))
+            event.setCancelled(true);
+    }
+
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onEntityExplode(EntityExplodeEvent event) {
         handleCheckLandBorders(event, event.blockList().stream().map(Block::getChunk).collect(Collectors.toSet()));
@@ -89,6 +96,15 @@ public class BlockEvents implements Listener {
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onStructureGrow(StructureGrowEvent event) {
         handleCheckLandBorders(event, event.getBlocks().stream().map(BlockState::getChunk).collect(Collectors.toSet()), event.getPlayer());
+    }
+
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
+    public void onBlockBurn(BlockBurnEvent event) { handleEveryoneAccessCheck(event, event.getBlock().getChunk()); }
+
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
+    public void onBlockIgnite(BlockIgniteEvent event) {
+        if (event.getCause().equals(BlockIgniteEvent.IgniteCause.SPREAD))
+            handleEveryoneAccessCheck(event, event.getBlock().getChunk());
     }
 
 }
