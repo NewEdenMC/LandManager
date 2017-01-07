@@ -7,7 +7,6 @@ import co.neweden.LandManager.Util;
 import org.bukkit.Chunk;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -20,7 +19,6 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.stream.Collectors;
 
 public class BlockEvents implements Listener {
@@ -56,15 +54,6 @@ public class BlockEvents implements Listener {
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockExplode(BlockExplodeEvent event) { handleCheckLandBorders(event, event.blockList().stream().map(Block::getChunk).collect(Collectors.toSet())); }
 
-    private void handleEntityExplosions(Cancellable event, Entity explodingEntity) {
-        if (event.isCancelled() || !(explodingEntity instanceof LivingEntity)) return;
-        LivingEntity entity = (LivingEntity) explodingEntity;
-        LandClaim land = LandManager.getLandClaim(entity.getLocation().getChunk());
-        if (land == null) return;
-        if (!ACL.testAccessLevel(land.getEveryoneAccessLevel(), ACL.Level.INTERACT))
-            event.setCancelled(true);
-    }
-
     private void handleEveryoneAccessCheck(Cancellable event, Chunk chunk) {
         LandClaim land = LandManager.getLandClaim(chunk);
         if (land == null) return;
@@ -75,7 +64,8 @@ public class BlockEvents implements Listener {
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onEntityExplode(EntityExplodeEvent event) {
         handleCheckLandBorders(event, event.blockList().stream().map(Block::getChunk).collect(Collectors.toSet()));
-        handleEntityExplosions(event, event.getEntity());
+        if (event.getEntity() instanceof LivingEntity) // aka check for creepers or other exploding entities which can move
+            handleEveryoneAccessCheck(event, event.getLocation().getChunk());
     }
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
@@ -86,11 +76,8 @@ public class BlockEvents implements Listener {
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onEntityBreakDoor(EntityBreakDoorEvent event) {
-        if (event.getEntity() instanceof Player) return;
-        LandClaim land = LandManager.getLandClaim(event.getBlock().getLocation().getChunk());
-        if (land == null) return;
-        if (!ACL.testAccessLevel(land.getEveryoneAccessLevel(), ACL.Level.INTERACT))
-            event.setCancelled(true);
+        if (!(event.getEntity() instanceof Player)) // e.g. prevent zombies breaking village doors
+            handleEveryoneAccessCheck(event, event.getBlock().getChunk());
     }
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
