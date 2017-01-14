@@ -6,6 +6,9 @@ website: https://neweden.co/
 version: 0.1-SNAPSHOT
 depend: [MenuGUI]
 commands:
+   ppersist:
+      description: Toggle persist mode for protection commands
+      permission: landmanager.ppersist
    claim:
       description: Claim the chunk the player is standing in, either as a new claim or for an existing one
       permission: landmanager.claim
@@ -67,6 +70,7 @@ permissions:
    landmanager.land:
       description: Gives player permissions to claim and use Land
       children:
+         landmanager.ppersist: true
          landmanager.claim: true
          landmanager.unclaim: true
          landmanager.linfo: true
@@ -96,6 +100,8 @@ permissions:
          landmanager.lseticon.any: true
          landmanager.lsethomeblock.any: true
          landmanager.listland.others: true
+   landmanager.ppersist:
+      description: Permission to use /ppersist command
    landmanager.claim:
       description: Permission to use /claim and /newclaim commands
    landmanager.claimlimit.unlimited:
