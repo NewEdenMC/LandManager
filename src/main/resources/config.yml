@@ -5,6 +5,10 @@ mysql:
    user: mc
    password:
 
+protections:
+   restricted_worlds_mode: whitelist
+   restricted_worlds_list: []
+
 land_claims:
    restricted_worlds_mode: whitelist
    restricted_worlds_list: []

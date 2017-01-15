@@ -8,11 +8,8 @@ import java.util.UUID;
 public class Protection extends ACL {
 
     private int id;
-    protected Type type;
     protected UUID owner;
     protected Level everyoneAccessLevel;
-
-    public enum Type { BLOCK, ENTITY }
 
     public Protection(int id) {
         this.id = id;
@@ -50,16 +47,6 @@ public class Protection extends ACL {
     }
 
     public int getID() { return id; }
-
-    public Type getType() { return type; }
-
-    public boolean setType(Type type) {
-        if (setDBValue("protection_type", type.toString())) {
-            this.type = type;
-            return true;
-        } else
-            return false;
-    }
 
     public UUID getOwner() { return owner; }
 

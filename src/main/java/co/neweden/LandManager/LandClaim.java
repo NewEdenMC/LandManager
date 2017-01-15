@@ -130,7 +130,7 @@ public class LandClaim extends ACL {
         if (LandManager.isChunkClaimed(chunk))
             return false;
 
-        if (LandManager.isWorldRestricted(chunk.getWorld()))
+        if (LandManager.isWorldRestrictedForClaims(chunk.getWorld()))
             throw new RestrictedWorldException(chunk.getWorld(), "Unable to claim chunk as the World is restricted by the configuration.", "It is not possible to claim a chunk in this world.");
 
         try {

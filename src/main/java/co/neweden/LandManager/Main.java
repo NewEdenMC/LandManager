@@ -63,9 +63,9 @@ public class Main extends JavaPlugin {
             LandManager.db.createStatement().execute(
                     "CREATE TABLE IF NOT EXISTS `protections` (\n" +
                     "  `protection_id` INT NOT NULL AUTO_INCREMENT,\n" +
-                    "  `protection_type` VARCHAR(128) NOT NULL,\n" +
                     "  `world` VARCHAR(128) NULL,\n" +
                     "  `x` INT NULL,\n" +
+                    "  `y` INT NULL,\n" +
                     "  `z` INT NULL,\n" +
                     "  `owner` VARCHAR(36) NOT NULL,\n" +
                     "  `everyone_acl_level` VARCHAR(32) NULL,\n" +

@@ -6,6 +6,7 @@ import co.neweden.menugui.menu.Menu;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
@@ -19,11 +20,76 @@ public class LandManager {
     protected static Main plugin;
     protected static Connection db;
     protected static Map<Integer, LandClaim> landClaims = new HashMap<>();
+    private static Map<Location, Protection> blockProtections = new HashMap<>();
     protected static Menu landListMenu;
 
     public static Main getPlugin() { return plugin; }
 
     public static Connection getDB() { return db; }
+
+    public static Protection getProtection(Block block) {
+        if (blockProtections.containsKey(block.getLocation()))
+            return blockProtections.get(block.getLocation());
+
+        try {
+            PreparedStatement st = getDB().prepareStatement("SELECT protection_id, protection_type, owner, everyone_acl_level FROM protections WHERE world=? AND x=? AND y=? AND z=?");
+            st.setString(1, block.getWorld().getName());
+            st.setInt(2, block.getX());
+            st.setInt(3, block.getY());
+            st.setInt(4, block.getZ());
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                Protection p = new Protection(rs.getInt("protection_id"));
+
+                try {
+                    p.owner = UUID.fromString(rs.getString("owner"));
+                } catch (IllegalArgumentException e) {
+                    getPlugin().getLogger().log(Level.SEVERE, "Protection ID #" + rs.getInt("protection_id") + ": UUID \"" + rs.getString("owner") + "\" is not valid, Protection will not be loaded.");
+                    return null;
+                }
+
+                try {
+                    if (rs.getString("everyone_acl_level") != null)
+                        p.everyoneAccessLevel = ACL.Level.valueOf(rs.getString("everyone_acl_level"));
+                } catch (IllegalArgumentException e) {
+                    getPlugin().getLogger().log(Level.SEVERE, "Protection ID #" + rs.getInt("protection_id") + ": Value \"" + rs.getString("everyone_acl_level") + "\" is not valid, default Level will be used instead.");
+                }
+
+                blockProtections.put(block.getLocation(), p);
+                return p;
+            }
+        } catch (SQLException e) {
+            getPlugin().getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to get block protection information.", e);
+        }
+        return null;
+    }
+
+    public static Protection createProtection(UUID owner, Block block) throws RestrictedWorldException {
+        try {
+            PreparedStatement st = getDB().prepareStatement("INSERT INTO `protections` (`world`, `x`, `y`, `z`, `owner`) VALUES (?, ?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
+            st.setString(1, block.getWorld().getName());
+            st.setInt(2, block.getX());
+            st.setInt(3, block.getY());
+            st.setInt(4, block.getZ());
+            st.setString(5, owner.toString());
+            st.executeUpdate();
+            ResultSet rs = st.getGeneratedKeys();
+            rs.next();
+
+            if (LandManager.isWorldRestrictedForProtections(block.getWorld()))
+                throw new RestrictedWorldException(block.getWorld(), "Unable to create Protection in this World as it is restricted by the configuration.", "You are not allowed to create a protection in this world.");
+
+            int pID = rs.getInt(1);
+            Protection p = new Protection(pID);
+            p.owner = owner;
+            blockProtections.put(block.getLocation(), p);
+
+            return p;
+        } catch (SQLException e) {
+            getPlugin().getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to create a new Protection.", e);
+            return null;
+        }
+    }
 
     public static Menu getLandListMenu() { return landListMenu; }
 
@@ -62,7 +128,7 @@ public class LandManager {
             if (!LandManager.canPlayerClaimMoreLand(owner))
                 throw new LandClaimLimitReachedException(null, owner, "Cannot create a new Land Claim for Player " + owner + " as the Player has reached their Land Claim Limit, limit: " + getLandClaimLimit(owner), "Unable to create a new Land Claim as you have reached your Land Claim Limit of " + getLandClaimLimit(owner) + " Land Claims.");
 
-            if (LandManager.isWorldRestricted(homeLocation.getWorld()))
+            if (LandManager.isWorldRestrictedForClaims(homeLocation.getWorld()))
                 throw new RestrictedWorldException(homeLocation.getWorld(), "Unable to create Land Claim in this World as it is restricted by the configuration.", "You are not allowed to create a Land Claim in this world.");
 
             int landID = rs.getInt(1);
@@ -78,9 +144,12 @@ public class LandManager {
         }
     }
 
-    public static boolean isWorldRestricted(World world) {
-        String restrictedMode = LandManager.getPlugin().getConfig().getString("land_claims.restricted_worlds_mode", "");
-        Collection<String> restrictedWorlds = LandManager.getPlugin().getConfig().getStringList("land_claims.restricted_worlds_list");
+    public static boolean isWorldRestrictedForProtections(World world) { return isWorldRestricted("protections", world); }
+    public static boolean isWorldRestrictedForClaims(World world) { return isWorldRestricted("land_claims", world); }
+
+    private static boolean isWorldRestricted(String type, World world) {
+        String restrictedMode = LandManager.getPlugin().getConfig().getString(type + ".restricted_worlds_mode", "");
+        Collection<String> restrictedWorlds = LandManager.getPlugin().getConfig().getStringList(type + ".restricted_worlds_list");
 
         if (restrictedMode.equalsIgnoreCase("whitelist")) {
             if (!restrictedWorlds.contains(world.getName()))
