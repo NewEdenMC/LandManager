@@ -61,6 +61,25 @@ public class Main extends JavaPlugin {
     private boolean setupDB() {
         try {
             LandManager.db.createStatement().execute(
+                    "CREATE TABLE IF NOT EXISTS `protections` (\n" +
+                    "  `protection_id` INT NOT NULL AUTO_INCREMENT,\n" +
+                    "  `protection_type` VARCHAR(128) NOT NULL,\n" +
+                    "  `world` VARCHAR(128) NULL,\n" +
+                    "  `x` INT NULL,\n" +
+                    "  `z` INT NULL,\n" +
+                    "  `owner` VARCHAR(36) NOT NULL,\n" +
+                    "  `everyone_acl_level` VARCHAR(32) NULL,\n" +
+                    "  PRIMARY KEY (`protection_id`)\n" +
+                    ");\n"
+            );
+            LandManager.db.createStatement().execute(
+                    "CREATE TABLE IF NOT EXISTS `protections_acl` (\n" +
+                    "  `protection_id` INT NOT NULL,\n" +
+                    "  `uuid` VARCHAR(36) NOT NULL,\n" +
+                    "  `level` VARCHAR(32) NOT NULL\n" +
+                    ");"
+            );
+            LandManager.db.createStatement().execute(
                     "CREATE TABLE IF NOT EXISTS `landclaims` (\n" +
                     "  `land_id` INT NOT NULL AUTO_INCREMENT,\n" +
                     "  `displayName` VARCHAR(128),\n" +
