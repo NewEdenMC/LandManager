@@ -5,6 +5,7 @@ import co.neweden.LandManager.Exceptions.RestrictedWorldException;
 import co.neweden.menugui.menu.Menu;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -160,6 +161,17 @@ public class LandManager {
         }
 
         return false;
+    }
+
+    public static boolean canBlockBeProtected(Material material) {
+        if (!getPlugin().getConfig().isConfigurationSection("protections.blocks") || // if no blocks have been configured any blocks can be protected
+                getPlugin().getConfig().isConfigurationSection("protections.blocks." + material.toString().toLowerCase())) return true;
+        else
+            return false;
+    }
+
+    public static boolean canBlockAutoProtect(Material material) {
+        return getPlugin().getConfig().getBoolean("protections.blocks." + material.toString().toLowerCase() + ".autoProtect", false);
     }
 
     public static Collection<LandClaim> getAdjacentClaims(Chunk chunk) { return getAdjacentClaims(chunk, null); }

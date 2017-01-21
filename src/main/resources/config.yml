@@ -8,6 +8,9 @@ mysql:
 protections:
    restricted_worlds_mode: whitelist
    restricted_worlds_list: []
+   blocks:
+      chest:
+         auto_protect: true
 
 land_claims:
    restricted_worlds_mode: whitelist

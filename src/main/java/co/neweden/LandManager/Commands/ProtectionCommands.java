@@ -82,6 +82,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
     private void infoCommand(Player player, Block block) {
         String status = "&7Not Protected";
         String owner = "";
+        String canProtect = "&ayes";
         String acl = "- &7EVERYONE (FULL_ACCESS)";
 
         Protection protection = LandManager.getProtection(block);
@@ -100,9 +101,13 @@ public class ProtectionCommands implements CommandExecutor, Listener {
             }
         }
 
+        if (!LandManager.canBlockBeProtected(block.getType()))
+            canProtect = "&cno";
+
         player.sendMessage(Util.formatString(
                 "Chunk status: " + status + "&r\n" +
-                "Land owned by: " + owner + "&r\n\n" +
+                "Land owned by: " + owner + "&r\n" +
+                "Can block type " + block.getType().toString().toLowerCase() + " be protected: " + canProtect + "&r\n" +
                 "Access Control List:\n" + acl
         ));
     }
