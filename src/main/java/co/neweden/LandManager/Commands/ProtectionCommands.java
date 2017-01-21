@@ -60,11 +60,13 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         return true;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         if (!event.getAction().equals(Action.LEFT_CLICK_BLOCK) ||
                 !cmdCache.containsKey(player)) return;
+
+        event.setCancelled(true);
 
         CommandCache cmd = cmdCache.get(player);
         if (!persistPlayers.contains(player))
