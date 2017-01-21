@@ -171,7 +171,7 @@ public class LandManager {
     }
 
     public static boolean canBlockAutoProtect(Material material) {
-        return getPlugin().getConfig().getBoolean("protections.blocks." + material.toString().toLowerCase() + ".autoProtect", false);
+        return getPlugin().getConfig().getBoolean("protections.blocks." + material.toString().toLowerCase() + ".auto_protect", false);
     }
 
     public static Collection<LandClaim> getAdjacentClaims(Chunk chunk) { return getAdjacentClaims(chunk, null); }
