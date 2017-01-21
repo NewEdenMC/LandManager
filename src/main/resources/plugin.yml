@@ -9,6 +9,10 @@ commands:
    ppersist:
       description: Toggle persist mode for protection commands
       permission: landmanager.ppersist
+   pprotect:
+      description: Create a new protection
+      permission: landmanager.pprotect
+      aliases: lock
    pinfo:
       description: Get information about a Protection
       permission: landmanager.pinfo
@@ -74,6 +78,7 @@ permissions:
       description: Gives player permissions to claim and use Land
       children:
          landmanager.ppersist: true
+         landmanager.pprotect: true
          landmanager.pinfo: true
          landmanager.claim: true
          landmanager.unclaim: true
@@ -106,6 +111,8 @@ permissions:
          landmanager.listland.others: true
    landmanager.ppersist:
       description: Permission to use /ppersist command
+   landmanager.pprotect:
+      description: Permission to use /pprotect and /lock command
    landmanager.pinfo:
       description: Permission to use /pinfo command
    landmanager.claim:

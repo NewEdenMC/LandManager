@@ -1,6 +1,7 @@
 package co.neweden.LandManager.Commands;
 
 import co.neweden.LandManager.ACL;
+import co.neweden.LandManager.Exceptions.UserException;
 import co.neweden.LandManager.LandManager;
 import co.neweden.LandManager.Protection;
 import co.neweden.LandManager.Util;
@@ -26,6 +27,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
 
     public ProtectionCommands() {
         LandManager.getPlugin().getCommand("ppersist").setExecutor(this);
+        LandManager.getPlugin().getCommand("pprotect").setExecutor(this);
         LandManager.getPlugin().getCommand("pinfo").setExecutor(this);
         Bukkit.getPluginManager().registerEvents(this, LandManager.getPlugin());
     }
@@ -74,11 +76,25 @@ public class ProtectionCommands implements CommandExecutor, Listener {
 
         try {
             switch (cmd.command.toLowerCase()) {
+                case "pprotect": protectCommand(player, event.getClickedBlock()); break;
                 case "pinfo": infoCommand(player, event.getClickedBlock()); break;
             }
         } catch (CommandException e) {
             event.getPlayer().sendMessage(Util.formatString(e.getMessage()));
         }
+    }
+
+    private void protectCommand(Player player, Block block) {
+        if (LandManager.getProtection(block) != null)
+            throw new CommandException("&cYou can't create a new protection as this " + block.getType().toString().toLowerCase() + " is already protected.");
+
+        try {
+            LandManager.createProtection(player.getUniqueId(), block);
+        } catch (UserException e) {
+            throw new CommandException("&c" + e.getUserMessage());
+        }
+
+        player.sendMessage(Util.formatString("&aProtection has been created."));
     }
 
     private void infoCommand(Player player, Block block) {
