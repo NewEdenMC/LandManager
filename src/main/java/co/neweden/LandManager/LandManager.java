@@ -33,7 +33,7 @@ public class LandManager {
             return blockProtections.get(block.getLocation());
 
         try {
-            PreparedStatement st = getDB().prepareStatement("SELECT protection_id, protection_type, owner, everyone_acl_level FROM protections WHERE world=? AND x=? AND y=? AND z=?");
+            PreparedStatement st = getDB().prepareStatement("SELECT protection_id, owner, everyone_acl_level FROM protections WHERE world=? AND x=? AND y=? AND z=?");
             st.setString(1, block.getWorld().getName());
             st.setInt(2, block.getX());
             st.setInt(3, block.getY());
