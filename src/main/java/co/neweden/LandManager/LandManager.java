@@ -66,6 +66,9 @@ public class LandManager {
     }
 
     public static Protection createProtection(UUID owner, Block block) throws RestrictedWorldException {
+        if (LandManager.isWorldRestrictedForProtections(block.getWorld()))
+            throw new RestrictedWorldException(block.getWorld(), "Unable to create Protection in this World as it is restricted by the configuration.", "You are not allowed to create a protection in this world.");
+
         try {
             PreparedStatement st = getDB().prepareStatement("INSERT INTO `protections` (`world`, `x`, `y`, `z`, `owner`) VALUES (?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
             st.setString(1, block.getWorld().getName());
@@ -76,9 +79,6 @@ public class LandManager {
             st.executeUpdate();
             ResultSet rs = st.getGeneratedKeys();
             rs.next();
-
-            if (LandManager.isWorldRestrictedForProtections(block.getWorld()))
-                throw new RestrictedWorldException(block.getWorld(), "Unable to create Protection in this World as it is restricted by the configuration.", "You are not allowed to create a protection in this world.");
 
             int pID = rs.getInt(1);
             Protection p = new Protection(pID);
@@ -118,6 +118,12 @@ public class LandManager {
     }
 
     public static LandClaim createClaim(UUID owner, Location homeLocation) throws RestrictedWorldException, LandClaimLimitReachedException {
+        if (!LandManager.canPlayerClaimMoreLand(owner))
+            throw new LandClaimLimitReachedException(null, owner, "Cannot create a new Land Claim for Player " + owner + " as the Player has reached their Land Claim Limit, limit: " + getLandClaimLimit(owner), "Unable to create a new Land Claim as you have reached your Land Claim Limit of " + getLandClaimLimit(owner) + " Land Claims.");
+
+        if (LandManager.isWorldRestrictedForClaims(homeLocation.getWorld()))
+            throw new RestrictedWorldException(homeLocation.getWorld(), "Unable to create Land Claim in this World as it is restricted by the configuration.", "You are not allowed to create a Land Claim in this world.");
+
         try {
             PreparedStatement st = LandManager.db.prepareStatement("INSERT INTO `landclaims` (`owner`, `home_location`) VALUES (?, ?);", Statement.RETURN_GENERATED_KEYS);
             st.setString(1, owner.toString());
@@ -125,12 +131,6 @@ public class LandManager {
             st.executeUpdate();
             ResultSet rs = st.getGeneratedKeys();
             rs.next();
-
-            if (!LandManager.canPlayerClaimMoreLand(owner))
-                throw new LandClaimLimitReachedException(null, owner, "Cannot create a new Land Claim for Player " + owner + " as the Player has reached their Land Claim Limit, limit: " + getLandClaimLimit(owner), "Unable to create a new Land Claim as you have reached your Land Claim Limit of " + getLandClaimLimit(owner) + " Land Claims.");
-
-            if (LandManager.isWorldRestrictedForClaims(homeLocation.getWorld()))
-                throw new RestrictedWorldException(homeLocation.getWorld(), "Unable to create Land Claim in this World as it is restricted by the configuration.", "You are not allowed to create a Land Claim in this world.");
 
             int landID = rs.getInt(1);
             LandClaim claim = new LandClaim(landID);
