@@ -67,7 +67,7 @@ public class LandManager {
 
     public static Protection createProtection(UUID owner, Block block) throws RestrictedWorldException {
         try {
-            PreparedStatement st = getDB().prepareStatement("INSERT INTO `protections` (`world`, `x`, `y`, `z`, `owner`) VALUES (?, ?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement st = getDB().prepareStatement("INSERT INTO `protections` (`world`, `x`, `y`, `z`, `owner`) VALUES (?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
             st.setString(1, block.getWorld().getName());
             st.setInt(2, block.getX());
             st.setInt(3, block.getY());
