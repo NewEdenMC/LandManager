@@ -18,30 +18,30 @@ public class Protection extends ACL {
 
     private void loadACL() {
         try {
-            PreparedStatement st = LandManager.getDB().prepareStatement("SELECT uuid,level FROM protections_acl WHERE land_id=?");
+            PreparedStatement st = LandManager.getDB().prepareStatement("SELECT uuid,level FROM protections_acl WHERE protection_id=?");
             st.setInt(1, getID());
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 try {
                     list.put(UUID.fromString(rs.getString("uuid")), Level.valueOf(rs.getString("level")));
                 } catch (IllegalArgumentException e) {
-                    LandManager.getPlugin().getLogger().warning("Land Claim #" + id + ": Invalid data for ACL Entry, UUID or Level are not valid");
+                    LandManager.getPlugin().getLogger().warning("Protection #" + id + ": Invalid data for ACL Entry, UUID or Level are not valid");
                 }
             }
         } catch (SQLException e) {
-            LandManager.getPlugin().getLogger().log(java.util.logging.Level.SEVERE, "Land Claim #" + id + ": An SQL Exception occurred while loading Land Claim ACL Data", e);
+            LandManager.getPlugin().getLogger().log(java.util.logging.Level.SEVERE, "Protection #" + id + ": An SQL Exception occurred while loading Land Claim ACL Data", e);
         }
     }
 
     private boolean setDBValue(String key, String value) {
         try {
-            PreparedStatement st = LandManager.db.prepareStatement("UPDATE protections SET " + key + "=? WHERE land_id=?;");
+            PreparedStatement st = LandManager.db.prepareStatement("UPDATE protections SET " + key + "=? WHERE protection_id=?;");
             st.setString(1, value);
             st.setInt(2, id);
             st.executeUpdate();
             return true;
         } catch (SQLException e) {
-            LandManager.getPlugin().getLogger().log(java.util.logging.Level.SEVERE, "Land Claim #" + id + ": An SQL Exception occurred while trying to update " + key + " to \"" + value + "\"", e);
+            LandManager.getPlugin().getLogger().log(java.util.logging.Level.SEVERE, "Protection #" + id + ": An SQL Exception occurred while trying to update " + key + " to \"" + value + "\"", e);
             return false;
         }
     }
