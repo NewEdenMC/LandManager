@@ -9,6 +9,9 @@ commands:
    ppersist:
       description: Toggle persist mode for protection commands
       permission: landmanager.ppersist
+   pinfo:
+      description: Get information about a Protection
+      permission: landmanager.pinfo
    claim:
       description: Claim the chunk the player is standing in, either as a new claim or for an existing one
       permission: landmanager.claim
@@ -71,6 +74,7 @@ permissions:
       description: Gives player permissions to claim and use Land
       children:
          landmanager.ppersist: true
+         landmanager.pinfo: true
          landmanager.claim: true
          landmanager.unclaim: true
          landmanager.linfo: true
@@ -102,6 +106,8 @@ permissions:
          landmanager.listland.others: true
    landmanager.ppersist:
       description: Permission to use /ppersist command
+   landmanager.pinfo:
+      description: Permission to use /pinfo command
    landmanager.claim:
       description: Permission to use /claim and /newclaim commands
    landmanager.claimlimit.unlimited:
