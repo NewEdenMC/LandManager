@@ -16,6 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.*;
@@ -82,6 +83,14 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         } catch (CommandException e) {
             event.getPlayer().sendMessage(Util.formatString(e.getMessage()));
         }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onBlockPlace(BlockPlaceEvent event) {
+        Block block = event.getBlock();
+        if (!LandManager.isWorldRestrictedForProtections(block.getWorld()) &&
+                LandManager.canBlockAutoProtect(block.getType()))
+            protectCommand(event.getPlayer(), block);
     }
 
     private void protectCommand(Player player, Block block) {
