@@ -41,7 +41,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         Player player = (Player) sender;
         if (handlePersist(command, player)) return true; // we are done if the player ran the persist command
         cmdCache.put(player, new CommandCache(command.getName(), args, System.currentTimeMillis()));
-        sender.sendMessage(Util.formatString("&aThe command is ready, left click a block to run this command!"));
+        sender.sendMessage(Util.formatString("&bThe command is ready, &eleft click&b a block to run this command!"));
 
         return true;
     }
@@ -123,8 +123,8 @@ public class ProtectionCommands implements CommandExecutor, Listener {
             canProtect = "&cno";
 
         player.sendMessage(Util.formatString(
-                "Chunk status: " + status + "&r\n" +
-                "Land owned by: " + owner + "&r\n" +
+                "Protection status: " + status + "&r\n" +
+                "Protection owned by: " + owner + "&r\n" +
                 "Can block type " + block.getType().toString().toLowerCase() + " be protected: " + canProtect + "&r\n" +
                 "Access Control List:\n" + acl
         ));
