@@ -75,15 +75,24 @@ permissions:
       default: op
       children:
          landmanager.land.moderator: true
+         landmanager.protections.moderator:
    landmanager.rtp:
       description: Permission to use /rtp command
-   landmanager.land:
-      description: Gives player permissions to claim and use Land
+   landmanager.protections:
+      description: Gives player permissions to protect things
       children:
          landmanager.ppersist: true
          landmanager.pprotect: true
          landmanager.unlock: true
          landmanager.pinfo: true
+   landmanager.protections.moderator:
+      description: Gives moderator permissions to manage protections
+      children:
+         landmanager.unlock.any: true
+         landmanager.pinfo.any: true
+   landmanager.land:
+      description: Gives player permissions to claim and use Land
+      children:
          landmanager.claim: true
          landmanager.unclaim: true
          landmanager.linfo: true
@@ -100,7 +109,6 @@ permissions:
       description: Gives moderator permissions to manage land
       children:
          landmanager.land: true
-         landmanager.unlock.any: true
          landmanager.unclaim.any: true
          landmanager.land.enterany: true
          landmanager.land.interactany: true
@@ -124,6 +132,8 @@ permissions:
       description: Permission to use /unlock command on any protection regardless of ACL Level
    landmanager.pinfo:
       description: Permission to use /pinfo command
+   landmanager.pinfo.any:
+      description: Permission to use /pinfo command on any protection regardless of ACL Level
    landmanager.claim:
       description: Permission to use /claim and /newclaim commands
    landmanager.claimlimit.unlimited:
