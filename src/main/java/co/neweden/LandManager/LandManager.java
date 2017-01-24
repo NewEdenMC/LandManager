@@ -13,6 +13,7 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ public class LandManager {
     protected static Main plugin;
     protected static Connection db;
     protected static Map<Integer, LandClaim> landClaims = new HashMap<>();
-    private static Map<Location, Protection> blockProtections = new HashMap<>();
+    private static Map<Location, Protection> blockProtections = new ConcurrentHashMap<>();
     protected static Menu landListMenu;
 
     public static Main getPlugin() { return plugin; }
@@ -90,6 +91,24 @@ public class LandManager {
             getPlugin().getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to create a new Protection.", e);
             return null;
         }
+    }
+
+    public static boolean deleteProtection(Protection protection) {
+        try {
+            blockProtections.entrySet().removeIf(e -> e.getValue().equals(protection));
+
+            PreparedStatement st = getDB().prepareStatement("DELETE FROM protections_acl WHERE protection_id=?");
+            st.setInt(1, protection.getID());
+            st.executeUpdate();
+
+            st = getDB().prepareStatement("DELETE FROM protections WHERE protection_id=?");
+            st.setInt(1, protection.getID());
+            st.executeUpdate();
+        } catch (SQLException e) {
+            getPlugin().getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to delete Protection #" + protection.getID(), e);
+            return false;
+        }
+        return true;
     }
 
     public static Menu getLandListMenu() { return landListMenu; }

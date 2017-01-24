@@ -29,6 +29,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
     public ProtectionCommands() {
         LandManager.getPlugin().getCommand("ppersist").setExecutor(this);
         LandManager.getPlugin().getCommand("pprotect").setExecutor(this);
+        LandManager.getPlugin().getCommand("unlock").setExecutor(this);
         LandManager.getPlugin().getCommand("pinfo").setExecutor(this);
         Bukkit.getPluginManager().registerEvents(this, LandManager.getPlugin());
     }
@@ -75,10 +76,25 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         if (!persistPlayers.contains(player))
             cmdCache.remove(player);
 
+        boolean end = true;
+
         try {
             switch (cmd.command.toLowerCase()) {
                 case "pprotect": protectCommand(player, event.getClickedBlock()); break;
                 case "pinfo": infoCommand(player, event.getClickedBlock()); break;
+                default: end = false;
+            }
+
+            if (end)
+                return; // to prevent the below code from executing after any of the above commands have executed
+
+            Protection protection = LandManager.getProtection(event.getClickedBlock());
+
+            if (protection == null)
+                throw new CommandException("&cThis " + event.getClickedBlock().getType().toString().toLowerCase() + " is not registered therefor you can't use this command on it.");
+
+            switch (cmd.command.toLowerCase()) {
+                case "unlock": unlockCommand(player, protection);
             }
         } catch (CommandException e) {
             event.getPlayer().sendMessage(Util.formatString(e.getMessage()));
@@ -104,6 +120,16 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         }
 
         player.sendMessage(Util.formatString("&aProtection has been created."));
+    }
+
+    private void unlockCommand(Player player, Protection protection) {
+        if (!protection.testAccessLevel(player, ACL.Level.FULL_ACCESS, "landmanager.unlock.any"))
+            throw new CommandException("&cYou do not have permission to remove this protection.");
+
+        if (!LandManager.deleteProtection(protection))
+            throw new CommandException("&cUnable to remove protection as an internal error occurred, please contact a staff member.");
+
+        player.sendMessage(Util.formatString("&aProtection successfully removed."));
     }
 
     private void infoCommand(Player player, Block block) {
