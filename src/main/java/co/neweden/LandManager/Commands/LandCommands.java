@@ -225,13 +225,7 @@ public class LandCommands implements CommandExecutor {
             status = "&aClaimed";
             name = land.getDisplayName();
             owner = Bukkit.getOfflinePlayer(land.getOwner()).getName();
-            acl = "";
-            for (Map.Entry<UUID, ACL.Level> entry : land.getACL().entrySet()) {
-                if (entry.getKey() != null)
-                    acl += "- " + Bukkit.getOfflinePlayer(entry.getKey()).getName() + " (" + entry.getValue() + ")\n";
-                else
-                    acl += "- &7EVERYONE (" + entry.getValue() + ")&r\n";
-            }
+            acl = ACLCommandHandlers.renderACL(land);
         }
 
         player.sendMessage(Util.formatString(

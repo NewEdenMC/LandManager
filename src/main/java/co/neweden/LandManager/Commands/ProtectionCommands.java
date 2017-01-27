@@ -145,13 +145,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
 
             status = "&aProtected";
             owner = Bukkit.getOfflinePlayer(protection.getOwner()).getName();
-            acl = "";
-            for (Map.Entry<UUID, ACL.Level> entry : protection.getACL().entrySet()) {
-                if (entry.getKey() != null)
-                    acl += "- " + Bukkit.getOfflinePlayer(entry.getKey()).getName() + " (" + entry.getValue() + ")\n";
-                else
-                    acl += "- &7EVERYONE (" + entry.getValue() + ")&r\n";
-            }
+            acl = ACLCommandHandlers.renderACL(protection);
         }
 
         if (!LandManager.canBlockBeProtected(block.getType()))
