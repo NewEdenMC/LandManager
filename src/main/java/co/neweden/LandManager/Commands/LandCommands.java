@@ -75,8 +75,8 @@ public class LandCommands implements CommandExecutor {
             switch (command.getName().toLowerCase()) {
                 case "unclaim": unClaimCommand(land, player); break;
                 case "ltransfer": transferCommand(land, player, args); break;
-                case "ladd": addCommand(land, player, args); break;
-                case "lremove": removeCommand(land, player, args); break;
+                case "ladd": ACLCommandHandlers.addCommand(land, player, args, "landmanager.ladd.any"); break;
+                case "lremove": ACLCommandHandlers.removeCommand(land, player, args, "landmanager.lremove.any"); break;
                 case "lpublic": publicCommand(land, player, args); break;
                 case "lprivate": privateCommand(land, player); break;
                 case "lrename": renameCommand(land, player, args); break;
@@ -254,52 +254,6 @@ public class LandCommands implements CommandExecutor {
         } catch (UserException e) { player.sendMessage(Util.formatString("&c" + e.getUserMessage())); }
 
         player.sendMessage(Util.formatString("&aYou have successfully transferred ownership of Land &e" + land.getDisplayName() + "&a to &e" + toPlayer.getName()));
-    }
-
-    private void addCommand(LandClaim land, Player player, String[] args) {
-        if (!land.testAccessLevel(player, ACL.Level.MODIFY, "landmanager.ladd.any"))
-            throw new CommandException("&cYou do not have permission to add another player to this land.");
-
-        if (args.length == 0)
-            throw new CommandException("&cYou did not specify a player to add to this land.");
-
-        OfflinePlayer addPlayer = Util.getOfflinePlayer(args[0]);
-
-        if (addPlayer == null)
-            throw new CommandException("&cPlayer \"" + args[0] + "\" not found.");
-
-        ACL.Level level = ACL.Level.MODIFY;
-        if (args.length >= 2) {
-            level = ACL.Level.valueOf(args[1].toUpperCase());
-            if (!level.equals(ACL.Level.INTERACT) && !level.equals(ACL.Level.MODIFY))
-                throw new CommandException("&cThe ACL Level \"" + args[1] + "\" is not valid or is not allowed, allowed levels are: INTERACT, MODIFY");
-        }
-
-        if (land.setAccess(addPlayer.getUniqueId(), level))
-            player.sendMessage(Util.formatString("&aPlayer &e" + addPlayer.getName() + "&a added to Land with access level &e" + level));
-        else
-            throw new CommandException("&cAn internal error occurred while trying to update the ACL, please contact a staff member.");
-    }
-
-    private void removeCommand(LandClaim land, Player player, String[] args) {
-        if (!land.testAccessLevel(player, ACL.Level.MODIFY, "landmanager.lremove.any"))
-            throw new CommandException("&cYou do not have permission to remove another player from this land.");
-
-        if (args.length == 0)
-            throw new CommandException("&cYou did not specify a player to remove from this land.");
-
-        OfflinePlayer removePlayer = Util.getOfflinePlayer(args[0]);
-
-        if (removePlayer == null)
-            throw new CommandException("&cPlayer \"" + args[0] + "\" not found.");
-
-        if (land.getACL().entrySet().stream().filter(e -> removePlayer.getUniqueId().equals(e.getKey())).count() == 0)
-            throw new CommandException("&cPlayer " + removePlayer.getName() + " cannot be removed from this Land as they are not on the Access List.");
-
-        if (land.setAccess(removePlayer.getUniqueId(), null))
-            player.sendMessage(Util.formatString("&aPlayer &e" + removePlayer.getName() + "&a remove from Land"));
-        else
-            throw new CommandException("&cAn internal error occurred while trying to update the ACL, please contact a staff member.");
     }
 
     private void publicCommand(LandClaim land, Player player, String[] args) {
