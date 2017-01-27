@@ -13,35 +13,34 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.sql.*;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 public class LandManager {
 
     protected static Main plugin;
     protected static Connection db;
     protected static Map<Integer, LandClaim> landClaims = new HashMap<>();
-    private static Map<Location, Protection> blockProtections = new ConcurrentHashMap<>();
+    private static List<BlockProtection> blockProtections = new CopyOnWriteArrayList<>();
     protected static Menu landListMenu;
 
     public static Main getPlugin() { return plugin; }
 
     public static Connection getDB() { return db; }
 
-    public static Protection getProtection(Block block) {
-        if (blockProtections.containsKey(block.getLocation()))
-            return blockProtections.get(block.getLocation());
+    public static BlockProtection getProtection(Block block) {
+        Optional<BlockProtection> bpOption = blockProtections.stream().filter(p -> p.getBlock().equals(block)).findFirst();
+        if (bpOption.isPresent()) return bpOption.get();
 
         try {
-            PreparedStatement st = getDB().prepareStatement("SELECT protection_id, owner, everyone_acl_level FROM protections WHERE world=? AND x=? AND y=? AND z=?");
+            PreparedStatement st = getDB().prepareStatement("SELECT * FROM protections WHERE world=? AND x=? AND y=? AND z=?");
             st.setString(1, block.getWorld().getName());
             st.setInt(2, block.getX());
             st.setInt(3, block.getY());
             st.setInt(4, block.getZ());
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                Protection p = new Protection(rs.getInt("protection_id"));
+                BlockProtection p = new BlockProtection(rs.getInt("protection_id"));
 
                 try {
                     p.owner = UUID.fromString(rs.getString("owner"));
@@ -57,7 +56,9 @@ public class LandManager {
                     getPlugin().getLogger().log(Level.SEVERE, "Protection ID #" + rs.getInt("protection_id") + ": Value \"" + rs.getString("everyone_acl_level") + "\" is not valid, default Level will be used instead.");
                 }
 
-                blockProtections.put(block.getLocation(), p);
+                p.block = block;
+
+                blockProtections.add(p);
                 return p;
             }
         } catch (SQLException e) {
@@ -66,7 +67,7 @@ public class LandManager {
         return null;
     }
 
-    public static Protection createProtection(UUID owner, Block block) throws RestrictedWorldException {
+    public static BlockProtection createProtection(UUID owner, Block block) throws RestrictedWorldException {
         if (LandManager.isWorldRestrictedForProtections(block.getWorld()))
             throw new RestrictedWorldException(block.getWorld(), "Unable to create Protection in this World as it is restricted by the configuration.", "You are not allowed to create a protection in this world.");
 
@@ -82,9 +83,10 @@ public class LandManager {
             rs.next();
 
             int pID = rs.getInt(1);
-            Protection p = new Protection(pID);
+            BlockProtection p = new BlockProtection(pID);
             p.owner = owner;
-            blockProtections.put(block.getLocation(), p);
+            p.block = block;
+            blockProtections.add(p);
 
             return p;
         } catch (SQLException e) {
@@ -95,7 +97,7 @@ public class LandManager {
 
     public static boolean deleteProtection(Protection protection) {
         try {
-            blockProtections.entrySet().removeIf(e -> e.getValue().equals(protection));
+            blockProtections.removeIf(p -> p.equals(protection));
 
             PreparedStatement st = getDB().prepareStatement("DELETE FROM protections_acl WHERE protection_id=?");
             st.setInt(1, protection.getID());
