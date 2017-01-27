@@ -77,8 +77,8 @@ public class LandCommands implements CommandExecutor {
                 case "ltransfer": transferCommand(land, player, args); break;
                 case "ladd": ACLCommandHandlers.addCommand(land, player, args, "landmanager.ladd.any"); break;
                 case "lremove": ACLCommandHandlers.removeCommand(land, player, args, "landmanager.lremove.any"); break;
-                case "lpublic": publicCommand(land, player, args); break;
-                case "lprivate": privateCommand(land, player); break;
+                case "lpublic": ACLCommandHandlers.publicCommand(land, "Land Claim", player, args, "landmanager.lpublic.any"); break;
+                case "lprivate": ACLCommandHandlers.privateCommand(land, "Land Claim", player, "landmanager.lprivate.any"); break;
                 case "lrename": renameCommand(land, player, args); break;
                 case "lseticon": setIconCommand(land, player, args); break;
                 case "lsethomeblock": setHomeBlockCommand(land, player); break;
@@ -254,33 +254,6 @@ public class LandCommands implements CommandExecutor {
         } catch (UserException e) { player.sendMessage(Util.formatString("&c" + e.getUserMessage())); }
 
         player.sendMessage(Util.formatString("&aYou have successfully transferred ownership of Land &e" + land.getDisplayName() + "&a to &e" + toPlayer.getName()));
-    }
-
-    private void publicCommand(LandClaim land, Player player, String[] args) {
-        if (!land.testAccessLevel(player, ACL.Level.MODIFY, "landmanager.lpublic.any"))
-            throw new CommandException("&cYou do not have permission to set this land as public.");
-
-        ACL.Level level = ACL.Level.INTERACT;
-        if (args.length >= 1) {
-            level = ACL.Level.valueOf(args[0].toUpperCase());
-            if (!level.equals(ACL.Level.VIEW) && !level.equals(ACL.Level.INTERACT))
-                throw new CommandException("&cThe ACL Level \"" + args[0] + "\" is not valid or is not allowed, allowed levels are: VIEW, INTERACT");
-        }
-
-        if (land.setEveryoneAccessLevel(level))
-            player.sendMessage(Util.formatString("&aLand set to public, access level for EVERYONE set to &e" + level));
-        else
-            throw new CommandException("&cAn internal error occurred while trying to update the ACL level for EVERYONE, please contact a staff member.");
-    }
-
-    private void privateCommand(LandClaim land, Player player) {
-        if (!land.testAccessLevel(player, ACL.Level.MODIFY, "landmanager.lprivate.any"))
-            throw new CommandException("&cYou do not have permission to set this land as private.");
-
-        if (land.setEveryoneAccessLevel(null))
-            player.sendMessage(Util.formatString("&aLand set to private, access level for EVERYONE has been reset to default."));
-        else
-            throw new CommandException("&cAn internal error occurred while trying to update the ACL level for EVERYONE, please contact a staff member.");
     }
 
     private void renameCommand(LandClaim land, Player player, String[] args) {
