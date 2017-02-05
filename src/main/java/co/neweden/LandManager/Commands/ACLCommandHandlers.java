@@ -23,23 +23,45 @@ public class ACLCommandHandlers {
         return render;
     }
 
-    protected static void addCommand(ACL acl, Player player, String[] args, String bypassPerm) {
+    protected static void accessCommand(ACL acl, String typeName, Player player, String[] args, String bypassPerm) {
         if (!acl.testAccessLevel(player, ACL.Level.MODIFY, bypassPerm))
-            throw new CommandException("&cYou do not have permission to add a player to the Access List.");
+            throw new CommandException("&cYou do not have permission modify the Access List.");
 
         if (args.length == 0)
+            throw new CommandException(accessCommandHelp(typeName));
+
+        switch (args[0].toLowerCase()) {
+            case "set": setCommand(acl, player, args, bypassPerm); break;
+            case "remove": removeCommand(acl, player, args, bypassPerm); break;
+            default:
+                player.sendMessage(Util.formatString("&cUnknown sub-command " + args[0] + "\n \n"));
+                throw new CommandException(accessCommandHelp(typeName));
+        }
+    }
+
+    private static String accessCommandHelp(String typeName) {
+        return Util.formatString(
+                "&bThis command allows you to add/change/remove access for this " + typeName + ", available sub-commands are:\n" +
+                "&f- &bset NAME [LEVEL]&f: Give or update a player's access to this " + typeName + "\n" +
+                "&f- &bremove NAME&f: Remove a player's access to this " + typeName + "\n \n" +
+                "&fIn the above commands &bNAME&F is the name of the player, and &b[LEVEL]&f the level of access to you want to set, the Level is optional"
+        );
+    }
+
+    protected static void setCommand(ACL acl, Player player, String[] args, String bypassPerm) {
+        if (args.length < 2)
             throw new CommandException("&cYou did not specify a player to add to the Access List.");
 
-        OfflinePlayer addPlayer = Util.getOfflinePlayer(args[0]);
+        OfflinePlayer addPlayer = Util.getOfflinePlayer(args[1]);
 
         if (addPlayer == null)
-            throw new CommandException("&cPlayer \"" + args[0] + "\" not found.");
+            throw new CommandException("&cPlayer \"" + args[1] + "\" not found.");
 
         ACL.Level level = ACL.Level.MODIFY;
-        if (args.length >= 2) {
-            level = ACL.Level.valueOf(args[1].toUpperCase());
+        if (args.length >= 3) {
+            level = ACL.Level.valueOf(args[2].toUpperCase());
             if (!level.equals(ACL.Level.INTERACT) && !level.equals(ACL.Level.MODIFY))
-                throw new CommandException("&cThe ACL Level \"" + args[1] + "\" is not valid or is not allowed, allowed levels are: INTERACT, MODIFY");
+                throw new CommandException("&cThe ACL Level \"" + args[2] + "\" is not valid or is not allowed, allowed levels are: INTERACT, MODIFY");
         }
 
         if (acl.setAccess(addPlayer.getUniqueId(), level))
@@ -49,16 +71,13 @@ public class ACLCommandHandlers {
     }
 
     protected static void removeCommand(ACL acl, Player player, String[] args, String bypassPerm) {
-        if (!acl.testAccessLevel(player, ACL.Level.MODIFY, bypassPerm))
-            throw new CommandException("&cYou do not have permission to remove a player from the Access List.");
-
-        if (args.length == 0)
+        if (args.length < 2)
             throw new CommandException("&cYou did not specify a player to remove from the Access List.");
 
-        OfflinePlayer removePlayer = Util.getOfflinePlayer(args[0]);
+        OfflinePlayer removePlayer = Util.getOfflinePlayer(args[1]);
 
         if (removePlayer == null)
-            throw new CommandException("&cPlayer \"" + args[0] + "\" not found.");
+            throw new CommandException("&cPlayer \"" + args[1] + "\" not found.");
 
         if (acl.getACL().entrySet().stream().filter(e -> removePlayer.getUniqueId().equals(e.getKey())).count() == 0)
             throw new CommandException("&cPlayer " + removePlayer.getName() + " cannot be removed as they are not on the Access List.");

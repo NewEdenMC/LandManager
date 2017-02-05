@@ -33,8 +33,7 @@ public class LandCommands implements CommandExecutor {
         LandManager.getPlugin().getCommand("unclaim").setExecutor(this);
         LandManager.getPlugin().getCommand("linfo").setExecutor(this);
         LandManager.getPlugin().getCommand("ltransfer").setExecutor(this);
-        LandManager.getPlugin().getCommand("ladd").setExecutor(this);
-        LandManager.getPlugin().getCommand("lremove").setExecutor(this);
+        LandManager.getPlugin().getCommand("laccess").setExecutor(this);
         LandManager.getPlugin().getCommand("lpublic").setExecutor(this);
         LandManager.getPlugin().getCommand("lprivate").setExecutor(this);
         LandManager.getPlugin().getCommand("lrename").setExecutor(this);
@@ -75,8 +74,7 @@ public class LandCommands implements CommandExecutor {
             switch (command.getName().toLowerCase()) {
                 case "unclaim": unClaimCommand(land, player); break;
                 case "ltransfer": transferCommand(land, player, args); break;
-                case "ladd": ACLCommandHandlers.addCommand(land, player, args, "landmanager.ladd.any"); break;
-                case "lremove": ACLCommandHandlers.removeCommand(land, player, args, "landmanager.lremove.any"); break;
+                case "laccess": ACLCommandHandlers.accessCommand(land, "Land Claim", player, args, "landmanager.laccess.any"); break;
                 case "lpublic": ACLCommandHandlers.publicCommand(land, "Land Claim", player, args, "landmanager.lpublic.any"); break;
                 case "lprivate": ACLCommandHandlers.privateCommand(land, "Land Claim", player, "landmanager.lprivate.any"); break;
                 case "lrename": renameCommand(land, player, args); break;
