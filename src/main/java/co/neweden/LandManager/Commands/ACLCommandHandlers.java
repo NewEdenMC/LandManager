@@ -100,7 +100,7 @@ public class ACLCommandHandlers {
         }
 
         if (acl.setEveryoneAccessLevel(level))
-            player.sendMessage(Util.formatString("&a" + typeName + " set to public, access level for EVERYONE set to &e" + level));
+            player.sendMessage(Util.formatString("&a" + typeName + " set to public, access level for &eEVERYONE&a set to &e" + level));
         else
             throw new CommandException("&cAn internal error occurred while trying to update the ACL level for EVERYONE, please contact a staff member.");
     }
@@ -110,7 +110,7 @@ public class ACLCommandHandlers {
             throw new CommandException("&cYou do not have permission to set this " + typeName + " as private.");
 
         if (acl.setEveryoneAccessLevel(null))
-            player.sendMessage(Util.formatString("&a" + typeName + " set to private, access level for EVERYONE has been reset to default."));
+            player.sendMessage(Util.formatString("&a" + typeName + " set to private, access level for &eEVERYONE&a has been reset to default."));
         else
             throw new CommandException("&cAn internal error occurred while trying to update the ACL level for EVERYONE, please contact a staff member.");
     }
