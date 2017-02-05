@@ -77,7 +77,7 @@ public class Protection extends ACL {
         try {
             PreparedStatement st;
             if (level == null) {
-                st = LandManager.getDB().prepareStatement("DELETE FROM protections_acl WHERE land_id=? AND uuid=?");
+                st = LandManager.getDB().prepareStatement("DELETE FROM protections_acl WHERE protection_id=? AND uuid=?");
                 st.setInt(1, getID());
                 st.setString(2, uuid.toString());
                 list.remove(uuid);
@@ -86,12 +86,12 @@ public class Protection extends ACL {
             }
 
             if (list.containsKey(uuid)) {
-                st = LandManager.getDB().prepareStatement("UPDATE protections_acl SET level=? WHERE land_id=? AND uuid=?");
+                st = LandManager.getDB().prepareStatement("UPDATE protections_acl SET level=? WHERE protection_id=? AND uuid=?");
                 st.setString(1, level.toString());
                 st.setInt(2, getID());
                 st.setString(3, uuid.toString());
             } else {
-                st = LandManager.getDB().prepareStatement("INSERT INTO protections_acl (land_id, uuid, level) VALUES (?, ?, ?);");
+                st = LandManager.getDB().prepareStatement("INSERT INTO protections_acl (protection_id, uuid, level) VALUES (?, ?, ?);");
                 st.setInt(1, getID());
                 st.setString(2, uuid.toString());
                 st.setString(3, level.toString());
@@ -99,7 +99,7 @@ public class Protection extends ACL {
             st.executeUpdate();
             list.put(uuid, level);
         } catch (SQLException e) {
-            LandManager.getPlugin().getLogger().log(java.util.logging.Level.SEVERE, "Land Claim #" + id + ": An SQL Exception occurred while trying to set access level for UUID \"" + uuid.toString() + "\" ", e);
+            LandManager.getPlugin().getLogger().log(java.util.logging.Level.SEVERE, "Protection #" + id + ": An SQL Exception occurred while trying to set access level for UUID \"" + uuid.toString() + "\" ", e);
             return false;
         }
         return true;
