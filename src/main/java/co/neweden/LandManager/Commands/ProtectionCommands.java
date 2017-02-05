@@ -180,7 +180,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         if (toPlayer == null)
             throw new CommandException("&cPlayer \"" + args[0] + "\" not found.");
 
-        if (!protection.setOwner(toPlayer.getUniqueId()) || !protection.setAccess(player.getUniqueId(), ACL.Level.MODIFY))
+        if (!protection.setAccess(protection.getOwner(), ACL.Level.MODIFY) || !protection.setOwner(toPlayer.getUniqueId()))
             throw new CommandException("&cAn internal error occurred while trying to transfer ownership of the Land, please contact a staff member.");
 
         player.sendMessage(Util.formatString("&aYou have successfully transferred ownership of this Protection to &e" + toPlayer.getName()));

@@ -247,7 +247,7 @@ public class LandCommands implements CommandExecutor {
             throw new CommandException("&cPlayer \"" + args[0] + "\" not found.");
 
         try {
-            if (!land.setOwner(toPlayer.getUniqueId()) || !land.setAccess(player.getUniqueId(), ACL.Level.MODIFY))
+            if (!land.setAccess(land.getOwner(), ACL.Level.MODIFY) || !land.setOwner(toPlayer.getUniqueId()))
                 throw new CommandException("&cAn internal error occurred while trying to transfer ownership of the Land, please contact a staff member.");
         } catch (UserException e) { player.sendMessage(Util.formatString("&c" + e.getUserMessage())); }
 
