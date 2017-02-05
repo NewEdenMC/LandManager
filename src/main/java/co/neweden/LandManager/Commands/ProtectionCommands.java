@@ -6,6 +6,7 @@ import co.neweden.LandManager.LandManager;
 import co.neweden.LandManager.Protection;
 import co.neweden.LandManager.Util;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandException;
@@ -31,6 +32,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         LandManager.getPlugin().getCommand("pprotect").setExecutor(this);
         LandManager.getPlugin().getCommand("unlock").setExecutor(this);
         LandManager.getPlugin().getCommand("pinfo").setExecutor(this);
+        LandManager.getPlugin().getCommand("ptransfer").setExecutor(this);
         LandManager.getPlugin().getCommand("paccess").setExecutor(this);
         LandManager.getPlugin().getCommand("ppublic").setExecutor(this);
         LandManager.getPlugin().getCommand("pprivate").setExecutor(this);
@@ -98,6 +100,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
 
             switch (cmd.command.toLowerCase()) {
                 case "unlock": unlockCommand(player, protection); break;
+                case "ptransfer": transferCommand(protection, player, cmd.args); break;
                 case "paccess": ACLCommandHandlers.accessCommand(protection, "Protection", event.getPlayer(), cmd.args, "landmanager.paccess.any"); break;
                 case "ppublic": ACLCommandHandlers.publicCommand(protection, "Protection", event.getPlayer(), cmd.args, "landmanager.ppublic.any"); break;
                 case "pprivate": ACLCommandHandlers.privateCommand(protection, "Protection", event.getPlayer(), "landmanager.pprivate.any"); break;
@@ -163,6 +166,24 @@ public class ProtectionCommands implements CommandExecutor, Listener {
                 "Can block type " + block.getType().toString().toLowerCase() + " be protected: " + canProtect + "&r\n" +
                 "Access Control List:\n" + acl
         ));
+    }
+
+    private void transferCommand(Protection protection, Player player, String[] args) {
+        if (!protection.testAccessLevel(player, ACL.Level.FULL_ACCESS, "landmanager.ptransfer.any"))
+            throw new CommandException("&cYou do not have permission to transfer this Protection to another player.");
+
+        if (args.length == 0)
+            throw new CommandException("&cYou did not specify a player to transfer this Protection to.");
+
+        OfflinePlayer toPlayer = Util.getOfflinePlayer(args[0]);
+
+        if (toPlayer == null)
+            throw new CommandException("&cPlayer \"" + args[0] + "\" not found.");
+
+        if (!protection.setOwner(toPlayer.getUniqueId()) || !protection.setAccess(player.getUniqueId(), ACL.Level.MODIFY))
+            throw new CommandException("&cAn internal error occurred while trying to transfer ownership of the Land, please contact a staff member.");
+
+        player.sendMessage(Util.formatString("&aYou have successfully transferred ownership of this Protection to &e" + toPlayer.getName()));
     }
 
 }

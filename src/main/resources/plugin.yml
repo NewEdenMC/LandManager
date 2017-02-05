@@ -19,6 +19,10 @@ commands:
    pinfo:
       description: Get information about a Protection
       permission: landmanager.pinfo
+   ptransfer:
+      description: Transfer ownership of a Protection to another player
+      permission: landmanager.ptransfer
+      usage: /ptransfer [PLAYER_NAME]
    paccess:
       description: Modify the access list for a Protection
       permission: landmanager.paccess
@@ -91,6 +95,7 @@ permissions:
          landmanager.pprotect: true
          landmanager.unlock: true
          landmanager.pinfo: true
+         landmanager.ptransfer: true
          landmanager.paccess: true
          landmanager.ppublic: true
          landmanager.pprivate: true
@@ -99,6 +104,7 @@ permissions:
       children:
          landmanager.unlock.any: true
          landmanager.pinfo.any: true
+         landmanager.ptransfer.any: true
          landmanager.paccess.any: true
          landmanager.ppublic.any: true
          landmanager.pprivate.any: true
@@ -144,6 +150,10 @@ permissions:
       description: Permission to use /pinfo command
    landmanager.pinfo.any:
       description: Permission to use /pinfo command on any protection regardless of ACL Level
+   landmanager.ptransfer:
+      description: Permission to use /ptransfer command
+   landmanager.ptransfer.any:
+      description: Permission to use /ptransfer command on any protection regardless of ACL Level
    landmanager.paccess:
       description: Permission to use /paccess command
    landmanager.paccess.any:
