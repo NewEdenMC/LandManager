@@ -244,7 +244,7 @@ public class LandCommands implements CommandExecutor {
         OfflinePlayer toPlayer = Util.getOfflinePlayer(args[0]);
 
         if (toPlayer == null)
-            throw new CommandException("&cPlayer \"" + args[0] + "\"not found.");
+            throw new CommandException("&cPlayer \"" + args[0] + "\" not found.");
 
         try {
             if (!land.setOwner(toPlayer.getUniqueId()) || !land.setAccess(player.getUniqueId(), ACL.Level.MODIFY))
