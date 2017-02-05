@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-public class Protection extends ACL {
+public abstract class Protection extends ACL {
 
     private int id;
     protected UUID owner;
