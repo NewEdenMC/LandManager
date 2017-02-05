@@ -31,6 +31,9 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         LandManager.getPlugin().getCommand("pprotect").setExecutor(this);
         LandManager.getPlugin().getCommand("unlock").setExecutor(this);
         LandManager.getPlugin().getCommand("pinfo").setExecutor(this);
+        LandManager.getPlugin().getCommand("paccess").setExecutor(this);
+        LandManager.getPlugin().getCommand("ppublic").setExecutor(this);
+        LandManager.getPlugin().getCommand("pprivate").setExecutor(this);
         Bukkit.getPluginManager().registerEvents(this, LandManager.getPlugin());
     }
 
@@ -94,7 +97,10 @@ public class ProtectionCommands implements CommandExecutor, Listener {
                 throw new CommandException("&cThis " + event.getClickedBlock().getType().toString().toLowerCase() + " is not registered therefor you can't use this command on it.");
 
             switch (cmd.command.toLowerCase()) {
-                case "unlock": unlockCommand(player, protection);
+                case "unlock": unlockCommand(player, protection); break;
+                case "paccess": ACLCommandHandlers.accessCommand(protection, "Protection", event.getPlayer(), cmd.args, "landmanager.paccess.any"); break;
+                case "ppublic": ACLCommandHandlers.publicCommand(protection, "Protection", event.getPlayer(), cmd.args, "landmanager.ppublic.any"); break;
+                case "pprivate": ACLCommandHandlers.privateCommand(protection, "Protection", event.getPlayer(), "landmanager.pprivate.any"); break;
             }
         } catch (CommandException e) {
             event.getPlayer().sendMessage(Util.formatString(e.getMessage()));

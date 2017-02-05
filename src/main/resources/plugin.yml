@@ -19,6 +19,16 @@ commands:
    pinfo:
       description: Get information about a Protection
       permission: landmanager.pinfo
+   paccess:
+      description: Modify the access list for a Protection
+      permission: landmanager.paccess
+   ppublic:
+      description: Make the Protection public so everyone can use it
+      permission: landmanager.ppublic
+      usage: /ppublic [LEVEL]
+   pprivate:
+      description: Make the Protection private, resetting the ACL level for everyone back to the default
+      permission: landmanager.pprivate
    claim:
       description: Claim the chunk the player is standing in, either as a new claim or for an existing one
       permission: landmanager.claim
@@ -45,7 +55,7 @@ commands:
       permission: landmanager.lpublic
       usage: /lpublic [LEVEL]
    lprivate:
-      description: Make the Land private resetting the aCL level fro everyone back to thee default
+      description: Make the Land private, resetting the ACL level for everyone back to the default
       permission: landmanager.lprivate
    lrename:
       description: Change the name that shows up in /myland for this land, name can have spaces
@@ -81,11 +91,17 @@ permissions:
          landmanager.pprotect: true
          landmanager.unlock: true
          landmanager.pinfo: true
+         landmanager.paccess: true
+         landmanager.ppublic: true
+         landmanager.pprivate: true
    landmanager.protections.moderator:
       description: Gives moderator permissions to manage protections
       children:
          landmanager.unlock.any: true
          landmanager.pinfo.any: true
+         landmanager.paccess.any: true
+         landmanager.ppublic.any: true
+         landmanager.pprivate.any: true
    landmanager.land:
       description: Gives player permissions to claim and use Land
       children:
@@ -128,6 +144,18 @@ permissions:
       description: Permission to use /pinfo command
    landmanager.pinfo.any:
       description: Permission to use /pinfo command on any protection regardless of ACL Level
+   landmanager.paccess:
+      description: Permission to use /paccess command
+   landmanager.paccess.any:
+      description: Permission to use /paccess command on any protection regardless of ACL Level
+   landmanager.ppublic:
+      description: Permission to use /ppublic command
+   landmanager.ppublic.any:
+      description: Permission to use /ppublic command on any protection regardless of ACL Level
+   landmanager.pprivate:
+      description: Permission to use /pprivate command
+   landmanager.pprivate.any:
+      description: Permission to use /pprivate command on any protection regardless of ACL Level
    landmanager.claim:
       description: Permission to use /claim and /newclaim commands
    landmanager.claimlimit.unlimited:
