@@ -1,7 +1,6 @@
 package co.neweden.LandManager.Commands;
 
 import co.neweden.LandManager.ACL;
-import co.neweden.LandManager.Exceptions.LandClaimLimitReachedException;
 import co.neweden.LandManager.Exceptions.RestrictedWorldException;
 import co.neweden.LandManager.Exceptions.UnclaimChunkException;
 import co.neweden.LandManager.Exceptions.UserException;
@@ -9,7 +8,6 @@ import co.neweden.LandManager.LandClaim;
 import co.neweden.LandManager.LandManager;
 import co.neweden.LandManager.Listeners.MenuEvents;
 import co.neweden.LandManager.Util;
-import co.neweden.menugui.menu.MenuInstance;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
@@ -22,8 +20,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.UUID;
 
 public class LandCommands implements CommandExecutor {
 

@@ -1,7 +1,6 @@
 package co.neweden.LandManager.Listeners;
 
 import co.neweden.LandManager.ACL;
-import co.neweden.LandManager.LandClaim;
 import co.neweden.LandManager.LandManager;
 import co.neweden.LandManager.Util;
 import org.bukkit.Location;

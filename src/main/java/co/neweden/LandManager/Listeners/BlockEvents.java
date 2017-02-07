@@ -4,7 +4,6 @@ import co.neweden.LandManager.ACL;
 import co.neweden.LandManager.LandClaim;
 import co.neweden.LandManager.LandManager;
 import co.neweden.LandManager.Util;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -23,7 +22,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class BlockEvents implements Listener {
 
