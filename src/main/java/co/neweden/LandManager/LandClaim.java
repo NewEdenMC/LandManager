@@ -38,7 +38,7 @@ public class LandClaim extends ACL {
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 try {
-                    list.put(UUID.fromString(rs.getString("uuid")), Level.valueOf(rs.getString("level")));
+                    list.add(new Entry(UUID.fromString(rs.getString("uuid")), Level.valueOf(rs.getString("level")), false));
                 } catch (IllegalArgumentException e) {
                     LandManager.getPlugin().getLogger().warning("Land Claim #" + id + ": Invalid data for ACL Entry, UUID or Level are not valid");
                 }
@@ -47,6 +47,8 @@ public class LandClaim extends ACL {
             LandManager.getPlugin().getLogger().log(java.util.logging.Level.SEVERE, "Land Claim #" + id + ": An SQL Exception occurred while loading Land Claim ACL Data", e);
         }
     }
+
+    public ACL getParentACL() { return null; } // there is never a parent ACL for a Land Claim (yet)
 
     private boolean setDBValue(String key, String value) {
         try {
@@ -190,7 +192,7 @@ public class LandClaim extends ACL {
                 return true;
             }
 
-            if (list.containsKey(uuid)) {
+            if (list.contains(uuid)) {
                 st = LandManager.getDB().prepareStatement("UPDATE landclaims_acl SET level=? WHERE land_id=? AND uuid=?");
                 st.setString(1, level.toString());
                 st.setInt(2, getID());
@@ -202,7 +204,7 @@ public class LandClaim extends ACL {
                 st.setString(3, level.toString());
             }
             st.executeUpdate();
-            list.put(uuid, level);
+            list.add(new Entry(uuid, level, false));
         } catch (SQLException e) {
             LandManager.getPlugin().getLogger().log(java.util.logging.Level.SEVERE, "Land Claim #" + id + ": An SQL Exception occurred while trying to set access level for UUID \"" + uuid.toString() + "\" ", e);
             return false;

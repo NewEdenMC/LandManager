@@ -31,8 +31,8 @@ public class MenuEvents implements Listener {
 
         List<LandClaim> landList = new ArrayList<>();
         for (LandClaim land : LandManager.getLandClaims()) {
-            if (land.getACL().containsKey(forPlayer.getUniqueId()) &&
-                    !land.getACL().get(forPlayer.getUniqueId()).equals(ACL.Level.NO_ACCESS)) {
+            if (land.getACL().contains(forPlayer.getUniqueId()) &&
+                    !land.getACL().get(forPlayer.getUniqueId()).level.equals(ACL.Level.NO_ACCESS)) {
                 landList.add(land);
             }
         }

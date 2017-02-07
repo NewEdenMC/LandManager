@@ -12,6 +12,12 @@ public class BlockProtection extends Protection {
 
     public BlockProtection(int id) { super(id); }
 
+    public ACL getParentACL() { return getParent(); }
+
+    public LandClaim getParent() {
+        return LandManager.getLandClaim(block.getChunk());
+    }
+
     public Block getBlock() { return block; }
 
     public boolean setBlock(Block block) throws RestrictedWorldException {

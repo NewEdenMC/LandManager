@@ -14,11 +14,12 @@ public class ACLCommandHandlers {
 
     protected static String renderACL(ACL acl) {
         String render = "";
-        for (Map.Entry<UUID, ACL.Level> entry : acl.getACL().entrySet()) {
-            if (entry.getKey() != null)
-                render += "- " + Bukkit.getOfflinePlayer(entry.getKey()).getName() + " (" + entry.getValue() + ")\n";
+        for (ACL.Entry entry : acl.getACL()) {
+            if (entry.uuid != null)
+                render += "- " + Bukkit.getOfflinePlayer(entry.uuid).getName() + " (" + entry.level + ")";
             else
-                render += "- &7EVERYONE (" + entry.getValue() + ")&r\n";
+                render += "- &7EVERYONE (" + entry.level + ")";
+            render += (entry.inherited) ? " &e*&r\n" : "&r\n";
         }
         return render;
     }
@@ -79,7 +80,7 @@ public class ACLCommandHandlers {
         if (removePlayer == null)
             throw new CommandException("&cPlayer \"" + args[1] + "\" not found.");
 
-        if (acl.getACL().entrySet().stream().filter(e -> removePlayer.getUniqueId().equals(e.getKey())).count() == 0)
+        if (acl.getACL().stream().filter(e -> removePlayer.getUniqueId().equals(e.uuid)).count() == 0)
             throw new CommandException("&cPlayer " + removePlayer.getName() + " cannot be removed as they are not on the Access List.");
 
         if (acl.setAccess(removePlayer.getUniqueId(), null))
