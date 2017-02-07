@@ -10,43 +10,6 @@ public abstract class ACL {
 
     public enum Level { NO_ACCESS, VIEW, INTERACT, MODIFY, FULL_ACCESS }
 
-    public class Entry implements Comparable<Entry> {
-
-        public final UUID uuid;
-        public final Level level;
-        public final boolean inherited;
-
-        Entry(UUID uuid, Level level, boolean inherited) {
-            this.uuid = uuid; this.level = level; this.inherited = inherited;
-        }
-
-        @Override
-        public int compareTo(Entry another) {
-            return another.level.compareTo(level);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null) return false;
-            if (obj == this) return true;
-            if (!(obj instanceof Entry)) return false;
-            Entry e = (Entry) obj;
-            if (uuid != null && e.uuid != null) {
-                if (!uuid.equals(e.uuid)) return false;
-            } else return false;
-            return level == e.level && inherited == e.inherited;
-        }
-
-        public boolean equalsUUID(UUID other) {
-            if (uuid == null && other == null)
-                return true; // if both are null they are equal
-            if (uuid == null || other == null)
-                return false; // if one is null but the other isn't they are not equal
-            return uuid.equals(other); // neither are null, refer to built in method to provide answer
-        }
-
-    }
-
     public boolean testAccessLevel(UUID uuid, Level needed) { return testAccessLevel(getAccessLevel(uuid).level, needed); }
 
     public boolean testAccessLevel(Player player, Level needed, String bypassPermission) {
@@ -82,23 +45,23 @@ public abstract class ACL {
             getParentACL().getACL().forEach(e -> {
                 // anyone with FULL_ACCESS on parent ACL should only have MODIFY on this one
                 Level level = (e.level == Level.FULL_ACCESS) ? Level.MODIFY : e.level;
-                acl.add(new Entry(e.uuid, level, true));
+                acl.add(new ACLEntry(e.uuid, level, true));
             });
         }
         // now we add all ACL entries from this ACL, if a UUID has a value in the parent ACL and a value in this ACL
         // they will now be overridden so this ACL takes priority over the parent
         acl.addAll(list);
         // force the owner of this ACL to have full access
-        acl.add(new Entry(getOwner(), Level.FULL_ACCESS, false));
-        acl.add(new Entry(null, getEveryoneAccessLevel(), false));
+        acl.add(new ACLEntry(getOwner(), Level.FULL_ACCESS, false));
+        acl.add(new ACLEntry(null, getEveryoneAccessLevel(), false));
         return acl;
     }
 
     public abstract ACL getParentACL();
 
-    public Entry getAccessLevel(UUID uuid) {
-        Optional<Entry> opt = getACL().stream().filter(e -> e.uuid == uuid).findFirst();
-        return (opt.isPresent()) ? opt.get() : new Entry(uuid, getEveryoneAccessLevel(), false);
+    public ACLEntry getAccessLevel(UUID uuid) {
+        Optional<ACLEntry> opt = getACL().stream().filter(e -> e.uuid == uuid).findFirst();
+        return (opt.isPresent()) ? opt.get() : new ACLEntry(uuid, getEveryoneAccessLevel(), false);
     }
 
     public abstract UUID getOwner();

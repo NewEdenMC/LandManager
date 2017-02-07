@@ -23,7 +23,7 @@ public abstract class Protection extends ACL {
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 try {
-                    list.add(new Entry(UUID.fromString(rs.getString("uuid")), Level.valueOf(rs.getString("level")), false));
+                    list.add(new ACLEntry(UUID.fromString(rs.getString("uuid")), Level.valueOf(rs.getString("level")), false));
                 } catch (IllegalArgumentException e) {
                     LandManager.getPlugin().getLogger().warning("Protection #" + id + ": Invalid data for ACL Entry, UUID or Level are not valid");
                 }
@@ -97,7 +97,7 @@ public abstract class Protection extends ACL {
                 st.setString(3, level.toString());
             }
             st.executeUpdate();
-            list.add(new Entry(uuid, level, false));
+            list.add(new ACLEntry(uuid, level, false));
         } catch (SQLException e) {
             LandManager.getPlugin().getLogger().log(java.util.logging.Level.SEVERE, "Protection #" + id + ": An SQL Exception occurred while trying to set access level for UUID \"" + uuid.toString() + "\" ", e);
             return false;

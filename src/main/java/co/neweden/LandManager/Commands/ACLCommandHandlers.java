@@ -1,20 +1,18 @@
 package co.neweden.LandManager.Commands;
 
 import co.neweden.LandManager.ACL;
+import co.neweden.LandManager.ACLEntry;
 import co.neweden.LandManager.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandException;
 import org.bukkit.entity.Player;
 
-import java.util.Map;
-import java.util.UUID;
-
 public class ACLCommandHandlers {
 
     protected static String renderACL(ACL acl) {
         String render = "";
-        for (ACL.Entry entry : acl.getACL()) {
+        for (ACLEntry entry : acl.getACL()) {
             if (entry.uuid != null)
                 render += "- " + Bukkit.getOfflinePlayer(entry.uuid).getName() + " (" + entry.level + ")";
             else

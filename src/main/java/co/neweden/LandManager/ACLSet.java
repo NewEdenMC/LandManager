@@ -17,17 +17,17 @@ import java.util.stream.Collectors;
  the most sense for what we want to achieve.
  */
 
-public class ACLSet extends TreeSet<ACL.Entry> {
+public class ACLSet extends TreeSet<ACLEntry> {
 
     @Override
-    public boolean add(ACL.Entry entry) {
+    public boolean add(ACLEntry entry) {
         removeAll(stream().filter(e -> e.equalsUUID(entry.uuid)).collect(Collectors.toSet()));
         return super.add(entry);
     }
 
     @Override
-    public boolean addAll(Collection<? extends ACL.Entry> entries) {
-        for (ACL.Entry entry : entries) {
+    public boolean addAll(Collection<? extends ACLEntry> entries) {
+        for (ACLEntry entry : entries) {
             if (!add(entry)) return false;
         }
         return true;
@@ -53,8 +53,8 @@ public class ACLSet extends TreeSet<ACL.Entry> {
 
     public boolean contains(UUID uuid) { return (get(uuid) != null); }
 
-    public ACL.Entry get(UUID uuid) {
-        Optional<ACL.Entry> opt = stream().filter(e -> e.equalsUUID(uuid)).findFirst();
+    public ACLEntry get(UUID uuid) {
+        Optional<ACLEntry> opt = stream().filter(e -> e.equalsUUID(uuid)).findFirst();
         return (opt.isPresent()) ? opt.get() : null;
     }
 

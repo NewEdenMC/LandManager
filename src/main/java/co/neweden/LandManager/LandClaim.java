@@ -3,7 +3,6 @@ package co.neweden.LandManager;
 import co.neweden.LandManager.Exceptions.LandClaimLimitReachedException;
 import co.neweden.LandManager.Exceptions.RestrictedWorldException;
 import co.neweden.LandManager.Exceptions.UnclaimChunkException;
-import co.neweden.LandManager.Exceptions.UserException;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,11 +10,7 @@ import org.bukkit.Material;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
 
 public class LandClaim extends ACL {
 
@@ -38,7 +33,7 @@ public class LandClaim extends ACL {
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 try {
-                    list.add(new Entry(UUID.fromString(rs.getString("uuid")), Level.valueOf(rs.getString("level")), false));
+                    list.add(new ACLEntry(UUID.fromString(rs.getString("uuid")), Level.valueOf(rs.getString("level")), false));
                 } catch (IllegalArgumentException e) {
                     LandManager.getPlugin().getLogger().warning("Land Claim #" + id + ": Invalid data for ACL Entry, UUID or Level are not valid");
                 }
@@ -204,7 +199,7 @@ public class LandClaim extends ACL {
                 st.setString(3, level.toString());
             }
             st.executeUpdate();
-            list.add(new Entry(uuid, level, false));
+            list.add(new ACLEntry(uuid, level, false));
         } catch (SQLException e) {
             LandManager.getPlugin().getLogger().log(java.util.logging.Level.SEVERE, "Land Claim #" + id + ": An SQL Exception occurred while trying to set access level for UUID \"" + uuid.toString() + "\" ", e);
             return false;
