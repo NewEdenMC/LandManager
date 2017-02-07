@@ -12,11 +12,16 @@ public abstract class ACL {
 
     public boolean testAccessLevel(UUID uuid, Level needed) { return testAccessLevel(getAccessLevel(uuid).level, needed); }
 
+    public boolean testAccessLevel(Player player, Level needed, Collection<String> bypassPermissions) {
+        boolean hasall = true;
+        for (String p : bypassPermissions) {
+            if (!player.hasPermission(p)) hasall = false;
+        }
+        return (testAccessLevel(player.getUniqueId(), needed) || hasall);
+    }
+
     public boolean testAccessLevel(Player player, Level needed, String bypassPermission) {
-        if (testAccessLevel(player.getUniqueId(), needed) || player.hasPermission(bypassPermission))
-            return true;
-        else
-            return false;
+        return (testAccessLevel(player.getUniqueId(), needed) || player.hasPermission(bypassPermission));
     }
 
     public static boolean testAccessLevel(Level hasLevel, Level needed) {
