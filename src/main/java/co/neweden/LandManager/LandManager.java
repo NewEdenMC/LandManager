@@ -28,6 +28,19 @@ public class LandManager {
 
     public static Connection getDB() { return db; }
 
+    /*
+     Returns the first aka most significant ACL that can be found for the location
+     Starting by checking for a protection, then if none looking for a land claim
+     */
+    public static ACL getFirstACL(Location loc) {
+        // Check and return a protection if not null
+        Protection p = getProtection(loc.getBlock());
+        if (p != null) return p;
+        // Check and return LandClaim if not null
+        LandClaim l = getLandClaim(loc.getChunk());
+        if (l != null) return l; else return null;
+    }
+
     public static BlockProtection getProtection(Block block) {
         Optional<BlockProtection> bpOption = blockProtections.stream().filter(p -> p.getBlock().equals(block)).findFirst();
         if (bpOption.isPresent()) return bpOption.get();
