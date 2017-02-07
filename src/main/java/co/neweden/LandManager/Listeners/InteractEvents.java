@@ -18,19 +18,25 @@ import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 public class InteractEvents implements Listener {
 
     private void handleEvent(Location targetLocation, Cancellable event, Entity callingEntity) {
-        LandClaim land = LandManager.getLandClaim(targetLocation.getChunk());
-        if (land == null || callingEntity == null) return; // callingEntity may sometimes be null
+        ACL acl = LandManager.getFirstACL(targetLocation);
+        if (acl == null || callingEntity == null) return; // callingEntity may sometimes be null
         if (!(callingEntity instanceof Player)) return;
         Player player = (Player) callingEntity;
 
-        if (land.testAccessLevel(player, ACL.Level.INTERACT, "landmanager.land.interactany"))
+        Collection<String> bperms = new HashSet<>();
+        bperms.add("landmanager.land.interactany");
+        bperms.add("landmanager.protection.interactany");
+        if (acl.testAccessLevel(player, ACL.Level.INTERACT, bperms))
             return;
 
         event.setCancelled(true);
-        player.sendMessage(Util.formatString("&cYou do not have permission to interact with this Land Claim"));
+        player.sendMessage(Util.formatString("&cYou do not have permission to interact with this Land Claim or Protection"));
         player.updateInventory();
     }
 
