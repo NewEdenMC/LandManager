@@ -47,7 +47,6 @@ public class BlockEvents implements Listener {
         found.addAll(blocks.stream()
                 .map(LandManager::getProtection)
                 .filter(Objects::nonNull).collect(Collectors.toSet()));
-        System.out.print(found);
 
         if (found.size() < 1) return; // we use Set.size() instead of the Lambda count() as we can take advantage of Sets ability to group/override duplicate values for us
         if (trigger != null) {
