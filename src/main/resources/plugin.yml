@@ -85,7 +85,7 @@ permissions:
       default: op
       children:
          landmanager.land.moderator: true
-         landmanager.protections.moderator:
+         landmanager.protections.moderator: true
    landmanager.rtp:
       description: Permission to use /rtp command
    landmanager.protections:
