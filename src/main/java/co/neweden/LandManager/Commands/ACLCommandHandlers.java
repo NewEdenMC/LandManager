@@ -30,7 +30,8 @@ public class ACLCommandHandlers {
             throw new CommandException(accessCommandHelp(typeName));
 
         switch (args[0].toLowerCase()) {
-            case "set": setCommand(acl, player, args, bypassPerm); break;
+            case "set":
+            case "add": setCommand(acl, player, args, bypassPerm); break;
             case "remove": removeCommand(acl, player, args, bypassPerm); break;
             default:
                 player.sendMessage(Util.formatString("&cUnknown sub-command " + args[0] + "\n \n"));
@@ -40,8 +41,9 @@ public class ACLCommandHandlers {
 
     private static String accessCommandHelp(String typeName) {
         return Util.formatString(
-                "&bThis command allows you to add/change/remove access for this " + typeName + ", available sub-commands are:\n" +
+                "&fThis command allows you to add/change/remove access for this " + typeName + ", available sub-commands are:\n" +
                 "&f- &bset NAME [LEVEL]&f: Give or update a player's access to this " + typeName + "\n" +
+                "&f- &badd NAME [LEVEL]&f: Exactly the same as &bset&f just another name for it\n" +
                 "&f- &bremove NAME&f: Remove a player's access to this " + typeName + "\n \n" +
                 "&fIn the above commands &bNAME&f is the name of the player, and &b[LEVEL]&f the level of access to you want to set, the Level is optional"
         );
