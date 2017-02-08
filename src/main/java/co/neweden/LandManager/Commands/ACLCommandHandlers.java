@@ -43,7 +43,7 @@ public class ACLCommandHandlers {
                 "&bThis command allows you to add/change/remove access for this " + typeName + ", available sub-commands are:\n" +
                 "&f- &bset NAME [LEVEL]&f: Give or update a player's access to this " + typeName + "\n" +
                 "&f- &bremove NAME&f: Remove a player's access to this " + typeName + "\n \n" +
-                "&fIn the above commands &bNAME&F is the name of the player, and &b[LEVEL]&f the level of access to you want to set, the Level is optional"
+                "&fIn the above commands &bNAME&f is the name of the player, and &b[LEVEL]&f the level of access to you want to set, the Level is optional"
         );
     }
 
