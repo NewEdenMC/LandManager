@@ -78,8 +78,12 @@ public class ACLCommandHandlers {
         if (removePlayer == null)
             throw new CommandException("&cPlayer \"" + args[1] + "\" not found.");
 
-        if (acl.getACL().stream().filter(e -> removePlayer.getUniqueId().equals(e.uuid)).count() == 0)
+        ACLEntry entry = acl.getAccessLevel(removePlayer.getUniqueId());
+        if (entry.uuid == null)
             throw new CommandException("&cPlayer " + removePlayer.getName() + " cannot be removed as they are not on the Access List.");
+
+        if (entry.inherited)
+            throw new CommandException("&cPlayer " + removePlayer.getName() + " cannot be removed as their access is inherited from the parent ACL (probably a Land Claim), you can either remove them from the parent ACL or set their access to " + acl.getEveryoneAccessLevel());
 
         if (acl.setAccess(removePlayer.getUniqueId(), null))
             player.sendMessage(Util.formatString("&aPlayer &e" + removePlayer.getName() + "&a remove from the Access List."));
