@@ -64,9 +64,14 @@ public abstract class ACL {
 
     public abstract ACL getParentACL();
 
+    /*
+     Gets the ACL Entry for a given UUID, if the UUID is on the access list a complete ACLEntry
+     object will be returned, otherwise an ACLEntry object will be returned with a null UUID and
+     the access level for everyone obtained through ACL.getEveryoneAccessLevel()
+     */
     public ACLEntry getAccessLevel(UUID uuid) {
         Optional<ACLEntry> opt = getACL().stream().filter(e -> e.uuid == uuid).findFirst();
-        return (opt.isPresent()) ? opt.get() : new ACLEntry(uuid, getEveryoneAccessLevel(), false);
+        return (opt.isPresent()) ? opt.get() : new ACLEntry(null, getEveryoneAccessLevel(), false);
     }
 
     public abstract UUID getOwner();
