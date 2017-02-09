@@ -1,8 +1,6 @@
 package co.neweden.LandManager.Listeners;
 
-import co.neweden.LandManager.ACL;
-import co.neweden.LandManager.LandManager;
-import co.neweden.LandManager.Util;
+import co.neweden.LandManager.*;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -28,14 +26,22 @@ public class InteractEvents implements Listener {
         if (!(callingEntity instanceof Player)) return;
         Player player = (Player) callingEntity;
 
-        Collection<String> bperms = new HashSet<>();
-        bperms.add("landmanager.land.interactany");
-        bperms.add("landmanager.protection.interactany");
-        if (acl.testAccessLevel(player, ACL.Level.INTERACT, bperms))
+        String bperm = "";
+        String typeName = "";
+        if (acl instanceof Protection) {
+            bperm = "landmanager.protection.interactany";
+            typeName = "Protection";
+        }
+        if (acl instanceof LandClaim) {
+            bperm = "landmanager.protection.interactany";
+            typeName = "Land Claim";
+        }
+
+        if (acl.testAccessLevel(player, ACL.Level.INTERACT, bperm))
             return;
 
         event.setCancelled(true);
-        player.sendMessage(Util.formatString("&cYou do not have permission to interact with this Land Claim or Protection"));
+        player.sendMessage(Util.formatString("&cYou do not have permission to interact with this " + typeName));
         player.updateInventory();
     }
 
