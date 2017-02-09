@@ -1,9 +1,6 @@
 package co.neweden.LandManager.Listeners;
 
-import co.neweden.LandManager.ACL;
-import co.neweden.LandManager.LandClaim;
-import co.neweden.LandManager.LandManager;
-import co.neweden.LandManager.Util;
+import co.neweden.LandManager.*;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -57,6 +54,23 @@ public class BlockEvents implements Listener {
             trigger.sendMessage(Util.formatString("&cIt is not possible to perform this action, you are either to close to a Land border or this will effect a protection that you do not have access to."));
         }
         event.setCancelled(true);
+    }
+
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.LOWEST)
+    public void onBlockBreak(BlockBreakEvent event) {
+        Protection p = LandManager.getProtection(event.getBlock());
+        if (p == null) return;
+
+        if (!p.testAccessLevel(event.getPlayer(), ACL.Level.FULL_ACCESS, "landmanager.unlock.any")) {
+            event.getPlayer().sendMessage(Util.formatString("&cThis block is protected, you do not have permission to remove the protection by breaking it."));
+            event.setCancelled(true);
+            return;
+        }
+
+        if (LandManager.deleteProtection(p))
+            event.getPlayer().sendMessage(Util.formatString("&aThis block was protected, the protection has now been removed."));
+        else
+            event.getPlayer().sendMessage(Util.formatString("&cThis block was protected, there was a problem removing the protection, please contact a staff member."));
     }
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
