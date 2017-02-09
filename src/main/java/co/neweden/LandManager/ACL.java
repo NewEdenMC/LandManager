@@ -70,7 +70,7 @@ public abstract class ACL {
      the access level for everyone obtained through ACL.getEveryoneAccessLevel()
      */
     public ACLEntry getAccessLevel(UUID uuid) {
-        Optional<ACLEntry> opt = getACL().stream().filter(e -> e.uuid == uuid).findFirst();
+        Optional<ACLEntry> opt = getACL().stream().filter(e -> e.uuid.equals(uuid)).findFirst();
         return (opt.isPresent()) ? opt.get() : new ACLEntry(null, getEveryoneAccessLevel(), false);
     }
 
