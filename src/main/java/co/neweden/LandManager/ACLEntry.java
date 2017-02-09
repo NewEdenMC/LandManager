@@ -37,4 +37,10 @@ public class ACLEntry implements Comparable<ACLEntry> {
         return uuid.equals(other); // neither are null, refer to built in method to provide answer
     }
 
+    @Override
+    public String toString() {
+        String inherited = (this.inherited) ? " (inherited)" : "";
+        return String.format("%s:%s%s,", uuid, level, inherited);
+    }
+
 }

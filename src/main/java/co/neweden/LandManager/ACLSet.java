@@ -58,4 +58,13 @@ public class ACLSet extends TreeSet<ACLEntry> {
         return (opt.isPresent()) ? opt.get() : null;
     }
 
+    @Override
+    public String toString() {
+        String list = "";
+        for (ACLEntry e : this) {
+            list += "   " + e + "\n";
+        }
+        return "[\n" + list + "]";
+    }
+
 }
