@@ -21,7 +21,7 @@ public class LandManager {
     protected static Main plugin;
     protected static Connection db;
     protected static Map<Integer, LandClaim> landClaims = new HashMap<>();
-    private static List<BlockProtection> blockProtections = new CopyOnWriteArrayList<>();
+    protected static List<BlockProtection> blockProtections = new CopyOnWriteArrayList<>();
     protected static Menu landListMenu;
 
     public static Main getPlugin() { return plugin; }

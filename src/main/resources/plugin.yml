@@ -6,6 +6,9 @@ website: https://neweden.co/
 version: 0.1-SNAPSHOT
 depend: [MenuGUI]
 commands:
+   landmanager:
+      description: Administrative command to manage LandManager
+      permission: landmanager.admin
    ppersist:
       description: Toggle persist mode for protection commands
       permission: landmanager.ppersist
@@ -86,6 +89,9 @@ permissions:
       children:
          landmanager.land.moderator: true
          landmanager.protections.moderator: true
+         landmanager.admin: true
+   landmanager.admin:
+      description: Permission to use /landmanager command
    landmanager.rtp:
       description: Permission to use /rtp command
    landmanager.protections:

@@ -37,6 +37,24 @@ public class Main extends JavaPlugin {
         return true;
     }
 
+    public boolean reload() {
+        getLogger().info("Reloading LandManager");
+        reloadConfig();
+        LandManager.landClaims.clear();
+        if (!LandManager.landClaims.isEmpty()) return false;
+        LandManager.blockProtections.clear();
+        if (!LandManager.blockProtections.isEmpty()) return false;
+        boolean umenu = MenuGUI.unloadMenu(LandManager.landListMenu);
+        if (!umenu) return false;
+        try {
+            LandManager.db.close();
+        } catch (SQLException e) {
+            getLogger().log(Level.SEVERE, "Unable to close database connection", e);
+            return false;
+        }
+        return startup();
+    }
+
     private boolean loadDBConnection() {
         String host = getConfig().getString("mysql.host", null);
         String port = getConfig().getString("mysql.port", null);

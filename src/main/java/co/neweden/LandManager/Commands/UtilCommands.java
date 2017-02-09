@@ -15,17 +15,22 @@ import java.util.Random;
 public class UtilCommands implements CommandExecutor {
 
     public UtilCommands() {
+        LandManager.getPlugin().getCommand("landmanager").setExecutor(this);
         LandManager.getPlugin().getCommand("rtp").setExecutor(this);
     }
 
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(Util.formatString("&cYou must be a player to run this command"));
-            return true;
-        }
-        Player player = (Player) sender;
-
         try {
+            switch (command.getName().toLowerCase()) {
+                case "landmanager": adminCommand(sender, args); return true;
+            }
+
+            if (!(sender instanceof Player)) {
+                sender.sendMessage(Util.formatString("&cYou must be a player to run this command"));
+                return true;
+            }
+            Player player = (Player) sender;
+
             switch (command.getName().toLowerCase()) {
                 case "rtp": rtpCommand(player); break;
             }
@@ -34,6 +39,39 @@ public class UtilCommands implements CommandExecutor {
         }
 
         return true;
+    }
+
+    private void adminCommand(CommandSender sender, String[] args) {
+        if (args.length == 0)
+            throw new CommandException(adminCommandHelp());
+
+        switch (args[0].toLowerCase()) {
+            case "reload": reloadCommand(sender); break;
+            case "reloadconfig": reloadConfigCommand(sender); break;
+        }
+    }
+
+    private static String adminCommandHelp() {
+        return Util.formatString(
+                "&fLandManager version " + LandManager.getPlugin().getDescription().getVersion() + "\n" +
+                "&fAvailable sub-commands are:\n" +
+                "&f- &breload&f: reload all configurations from file, Protection and Land data from the database\n" +
+                "&f- &breloadconfig&f: reload the configuration from file"
+        );
+    }
+
+    private static void reloadCommand(CommandSender sender) {
+        sender.sendMessage(Util.formatString("&bReloading all data"));
+        if (LandManager.getPlugin().reload())
+            sender.sendMessage(Util.formatString("&aReload successful"));
+        else
+            throw new CommandException("&cReload failed");
+    }
+
+    private static void reloadConfigCommand(CommandSender sender) {
+        sender.sendMessage(Util.formatString("&bReloading config"));
+        LandManager.getPlugin().reloadConfig();
+        sender.sendMessage(Util.formatString("&aReload successful"));
     }
 
     private void rtpCommand(Player player) {
