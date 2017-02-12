@@ -30,9 +30,9 @@ public class ACLCommandHandlers {
             throw new CommandException(accessCommandHelp(typeName));
 
         switch (args[0].toLowerCase()) {
-            case "set":
-            case "add": setCommand(acl, player, args, bypassPerm); break;
-            case "remove": removeCommand(acl, player, args, bypassPerm); break;
+            case "add":
+            case "set": setCommand(acl, player, args); break;
+            case "remove": removeCommand(acl, player, args); break;
             default:
                 player.sendMessage(Util.formatString("&cUnknown sub-command " + args[0] + "\n \n"));
                 throw new CommandException(accessCommandHelp(typeName));
@@ -49,7 +49,7 @@ public class ACLCommandHandlers {
         );
     }
 
-    protected static void setCommand(ACL acl, Player player, String[] args, String bypassPerm) {
+    private static void setCommand(ACL acl, Player player, String[] args) {
         if (args.length < 2)
             throw new CommandException("&cYou did not specify a player to add to the Access List.");
 
@@ -71,7 +71,7 @@ public class ACLCommandHandlers {
             throw new CommandException("&cAn internal error occurred while trying to update the ACL, please contact a staff member.");
     }
 
-    protected static void removeCommand(ACL acl, Player player, String[] args, String bypassPerm) {
+    private static void removeCommand(ACL acl, Player player, String[] args) {
         if (args.length < 2)
             throw new CommandException("&cYou did not specify a player to remove from the Access List.");
 
