@@ -1,6 +1,7 @@
 package co.neweden.LandManager.Listeners;
 
 import co.neweden.LandManager.*;
+import co.neweden.LandManager.Exceptions.RestrictedWorldException;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -33,6 +34,19 @@ public class BlockEvents implements Listener {
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockFromTo(BlockFromToEvent event) { handleBlockMove(event, event.getBlock(), event.getToBlock()); }
+
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.LOWEST)
+    public void onBlockFromToUpdate(BlockFromToEvent event) {
+        BlockProtection p = LandManager.getProtection(event.getBlock());
+        if (p == null || event.getBlock().isLiquid()) return;
+
+        try {
+            if (!p.setBlock(event.getToBlock()))
+                event.setCancelled(true);
+        } catch (RestrictedWorldException e) {
+            event.setCancelled(true);
+        }
+    }
 
     private void handleCheckBlocks(Cancellable event, Collection<Block> blocks) { handleCheckBlocks(event, blocks, null);}
     private void handleCheckBlocks(Cancellable event, Collection<Block> blocks, Player trigger) {
