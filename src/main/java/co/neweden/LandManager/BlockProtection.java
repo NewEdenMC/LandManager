@@ -25,7 +25,7 @@ public class BlockProtection extends Protection {
             throw new RestrictedWorldException(block.getWorld(), "Cannot change the World of protection #" + getID() + " to World " + block.getWorld().getName() + " as this world is restricted.", "Cannot change the world of this protection as the new world is restricted.");
 
         if (LandManager.getProtection(block) != null)
-            return false;
+            return false; // prevent this protection from being set to a block which is already protected
 
         try {
             PreparedStatement st = LandManager.db.prepareStatement("UPDATE protections SET world=?,x=?,y=?,z=? WHERE protection_id=?;");
