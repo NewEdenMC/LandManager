@@ -61,10 +61,14 @@ public class BlockEvents implements Listener {
         if (trigger != null) {
             // if the event we are checking was triggered by a player we have the opportunity to check if the player is
             // allowed to perform any actions to the effected blocks
-            Collection<String> bperms = new HashSet<>();
-            bperms.add("landmanager.land.interactany");
-            bperms.add("landmanager.protection.interactany");
-            if (found.stream().filter(e -> e.testAccessLevel(trigger, ACL.Level.INTERACT, bperms)).count() == found.size()) return;
+            int count = 0;
+            for (ACL e : found) {
+                String bperm = "";
+                if (e instanceof Protection) bperm = "landmanager.protection.interactany";
+                if (e instanceof LandClaim) bperm = "landmanager.land.interactany";
+                if (e.testAccessLevel(trigger, ACL.Level.INTERACT, bperm)) count++;
+            }
+            if (count == found.size()) return;
             trigger.sendMessage(Util.formatString("&cIt is not possible to perform this action, you are either to close to a Land border or this will effect a protection that you do not have access to."));
         }
         event.setCancelled(true);
