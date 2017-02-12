@@ -33,7 +33,7 @@ public class InteractEvents implements Listener {
             typeName = "Protection";
         }
         if (acl instanceof LandClaim) {
-            bperm = "landmanager.protection.interactany";
+            bperm = "landmanager.land.interactany";
             typeName = "Land Claim";
         }
 
