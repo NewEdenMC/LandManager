@@ -22,7 +22,6 @@ public class LandManager {
     protected static Connection db;
     protected static Map<Integer, LandClaim> landClaims = new HashMap<>();
     protected static Protections protections;
-    protected static List<BlockProtection> blockProtections = new CopyOnWriteArrayList<>();
     protected static Menu landListMenu;
 
     public static Main getPlugin() { return plugin; }
@@ -37,63 +36,11 @@ public class LandManager {
      */
     public static ACL getFirstACL(Location loc) {
         // Check and return a protection if not null
-        Protection p = getProtection(loc.getBlock());
+        Protection p = protections().get(loc.getBlock());
         if (p != null) return p;
         // Check and return LandClaim if not null
         LandClaim l = getLandClaim(loc.getChunk());
         if (l != null) return l; else return null;
-    }
-
-    public static BlockProtection getProtection(Block block) {
-        Optional<BlockProtection> bpOption = blockProtections.stream().filter(p -> p.getBlock().equals(block)).findFirst();
-        return bpOption.orElse(null);
-    }
-
-    public static BlockProtection createProtection(UUID owner, Block block) throws RestrictedWorldException {
-        if (LandManager.isWorldRestrictedForProtections(block.getWorld()))
-            throw new RestrictedWorldException(block.getWorld(), "Unable to create Protection in this World as it is restricted by the configuration.", "You are not allowed to create a protection in this world.");
-
-        try {
-            PreparedStatement st = getDB().prepareStatement("INSERT INTO `protections` (`world`, `chunk_loc`, `x`, `y`, `z`, `owner`) VALUES (?, ?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
-            st.setString(1, block.getWorld().getName());
-            st.setString(2, block.getChunk().getX() + ":" + block.getChunk().getZ());
-            st.setInt(3, block.getX());
-            st.setInt(4, block.getY());
-            st.setInt(5, block.getZ());
-            st.setString(6, owner.toString());
-            st.executeUpdate();
-            ResultSet rs = st.getGeneratedKeys();
-            rs.next();
-
-            int pID = rs.getInt(1);
-            BlockProtection p = new BlockProtection(pID);
-            p.owner = owner;
-            p.block = block;
-            blockProtections.add(p);
-
-            return p;
-        } catch (SQLException e) {
-            getPlugin().getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to create a new Protection.", e);
-            return null;
-        }
-    }
-
-    public static boolean deleteProtection(Protection protection) {
-        try {
-            blockProtections.removeIf(p -> p.equals(protection));
-
-            PreparedStatement st = getDB().prepareStatement("DELETE FROM protections_acl WHERE protection_id=?");
-            st.setInt(1, protection.getID());
-            st.executeUpdate();
-
-            st = getDB().prepareStatement("DELETE FROM protections WHERE protection_id=?");
-            st.setInt(1, protection.getID());
-            st.executeUpdate();
-        } catch (SQLException e) {
-            getPlugin().getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to delete Protection #" + protection.getID(), e);
-            return false;
-        }
-        return true;
     }
 
     public static Menu getLandListMenu() { return landListMenu; }
@@ -149,10 +96,9 @@ public class LandManager {
         }
     }
 
-    public static boolean isWorldRestrictedForProtections(World world) { return isWorldRestricted("protections", world); }
     public static boolean isWorldRestrictedForClaims(World world) { return isWorldRestricted("land_claims", world); }
 
-    private static boolean isWorldRestricted(String type, World world) {
+    protected static boolean isWorldRestricted(String type, World world) {
         String restrictedMode = LandManager.getPlugin().getConfig().getString(type + ".restricted_worlds_mode", "");
         Collection<String> restrictedWorlds = LandManager.getPlugin().getConfig().getStringList(type + ".restricted_worlds_list");
 
@@ -165,17 +111,6 @@ public class LandManager {
         }
 
         return false;
-    }
-
-    public static boolean canBlockBeProtected(Material material) {
-        if (!getPlugin().getConfig().isConfigurationSection("protections.blocks") || // if no blocks have been configured any blocks can be protected
-                getPlugin().getConfig().isConfigurationSection("protections.blocks." + material.toString().toLowerCase())) return true;
-        else
-            return false;
-    }
-
-    public static boolean canBlockAutoProtect(Material material) {
-        return getPlugin().getConfig().getBoolean("protections.blocks." + material.toString().toLowerCase() + ".auto_protect", false);
     }
 
     public static Collection<LandClaim> getAdjacentClaims(Chunk chunk) { return getAdjacentClaims(chunk, null); }

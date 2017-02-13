@@ -40,8 +40,8 @@ public class Main extends JavaPlugin {
         reloadConfig();
         LandManager.landClaims.clear();
         if (!LandManager.landClaims.isEmpty()) return false;
-        LandManager.blockProtections.clear();
-        if (!LandManager.blockProtections.isEmpty()) return false;
+        LandManager.protections().blockProtections.clear();
+        if (!LandManager.protections().blockProtections.isEmpty()) return false;
         boolean umenu = MenuGUI.unloadMenu(LandManager.landListMenu);
         if (!umenu) return false;
         try {

@@ -93,7 +93,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
             if (end)
                 return; // to prevent the below code from executing after any of the above commands have executed
 
-            Protection protection = LandManager.getProtection(event.getClickedBlock());
+            Protection protection = LandManager.protections().get(event.getClickedBlock());
 
             if (protection == null)
                 throw new CommandException("&cThis " + event.getClickedBlock().getType().toString().toLowerCase() + " is not registered therefor you can't use this command on it.");
@@ -113,17 +113,17 @@ public class ProtectionCommands implements CommandExecutor, Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
         Block block = event.getBlock();
-        if (!LandManager.isWorldRestrictedForProtections(block.getWorld()) &&
-                LandManager.canBlockAutoProtect(block.getType()))
+        if (!LandManager.protections().isWorldRestricted(block.getWorld()) &&
+                LandManager.protections().canBlockAutoProtect(block.getType()))
             protectCommand(event.getPlayer(), block);
     }
 
     private void protectCommand(Player player, Block block) {
-        if (LandManager.getProtection(block) != null)
+        if (LandManager.protections().get(block) != null)
             throw new CommandException("&cYou can't create a new protection as this " + block.getType().toString().toLowerCase() + " is already protected.");
 
         try {
-            LandManager.createProtection(player.getUniqueId(), block);
+            LandManager.protections().create(player.getUniqueId(), block);
         } catch (UserException e) {
             throw new CommandException("&c" + e.getUserMessage());
         }
@@ -135,7 +135,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         if (!protection.testAccessLevel(player, ACL.Level.FULL_ACCESS, "landmanager.unlock.any"))
             throw new CommandException("&cYou do not have permission to remove this protection.");
 
-        if (!LandManager.deleteProtection(protection))
+        if (!LandManager.protections().delete(protection))
             throw new CommandException("&cUnable to remove protection as an internal error occurred, please contact a staff member.");
 
         player.sendMessage(Util.formatString("&aProtection successfully removed."));
@@ -147,7 +147,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         String canProtect = "&ayes";
         String acl = "- &7EVERYONE (FULL_ACCESS)";
 
-        Protection protection = LandManager.getProtection(block);
+        Protection protection = LandManager.protections().get(block);
         if (protection != null) {
             if (!protection.testAccessLevel(player, ACL.Level.VIEW, "landmanager.pinfo.any"))
                 throw new CommandException("&cThis is protected but you do not have permission to view the protection Info.");
@@ -157,7 +157,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
             acl = ACLCommandHandlers.renderACL(protection);
         }
 
-        if (!LandManager.canBlockBeProtected(block.getType()))
+        if (!LandManager.protections().canBlockBeProtected(block.getType()))
             canProtect = "&cno";
 
         player.sendMessage(Util.formatString(

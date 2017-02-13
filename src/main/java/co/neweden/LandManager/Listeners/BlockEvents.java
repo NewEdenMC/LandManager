@@ -33,7 +33,7 @@ public class BlockEvents implements Listener {
         LandClaim toLand = LandManager.getLandClaim(to.getChunk());
         if (toLand == null) return;
         if (toLand.equals(fromLand)) return;
-        if (LandManager.getProtection(from) != null || LandManager.getProtection(to) != null) return;
+        if (LandManager.protections().get(from) != null || LandManager.protections().get(to) != null) return;
         event.setCancelled(true);
     }
 
@@ -42,7 +42,7 @@ public class BlockEvents implements Listener {
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onBlockFromToUpdate(BlockFromToEvent event) {
-        BlockProtection p = LandManager.getProtection(event.getBlock());
+        BlockProtection p = LandManager.protections().get(event.getBlock());
         if (p == null || event.getBlock().isLiquid()) return;
 
         try {
@@ -59,7 +59,7 @@ public class BlockEvents implements Listener {
                 .map(Block::getChunk).map(LandManager::getLandClaim)
                 .filter(Objects::nonNull).collect(Collectors.toSet());
         found.addAll(blocks.stream()
-                .map(LandManager::getProtection)
+                .map(LandManager.protections()::get)
                 .filter(Objects::nonNull).collect(Collectors.toSet()));
 
         if (found.size() < 1) return; // we use Set.size() instead of the Lambda count() as we can take advantage of Sets ability to group/override duplicate values for us
@@ -81,7 +81,7 @@ public class BlockEvents implements Listener {
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent event) {
-        Protection p = LandManager.getProtection(event.getBlock());
+        Protection p = LandManager.protections().get(event.getBlock());
         if (p == null) return;
 
         if (!p.testAccessLevel(event.getPlayer(), ACL.Level.FULL_ACCESS, "landmanager.unlock.any")) {
@@ -90,7 +90,7 @@ public class BlockEvents implements Listener {
             return;
         }
 
-        if (LandManager.deleteProtection(p))
+        if (LandManager.protections().delete(p))
             event.getPlayer().sendMessage(Util.formatString("&aThis block was protected, the protection has now been removed."));
         else
             event.getPlayer().sendMessage(Util.formatString("&cThis block was protected, there was a problem removing the protection, please contact a staff member."));

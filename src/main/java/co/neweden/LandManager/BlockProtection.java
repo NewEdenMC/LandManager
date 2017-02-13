@@ -21,10 +21,10 @@ public class BlockProtection extends Protection {
     public Block getBlock() { return block; }
 
     public boolean setBlock(Block block) throws RestrictedWorldException {
-        if (LandManager.isWorldRestrictedForProtections(block.getWorld()))
+        if (LandManager.protections().isWorldRestricted(block.getWorld()))
             throw new RestrictedWorldException(block.getWorld(), "Cannot change the World of protection #" + getID() + " to World " + block.getWorld().getName() + " as this world is restricted.", "Cannot change the world of this protection as the new world is restricted.");
 
-        if (LandManager.getProtection(block) != null)
+        if (LandManager.protections().get(block) != null)
             return false; // prevent this protection from being set to a block which is already protected
 
         try {
