@@ -21,12 +21,15 @@ public class LandManager {
     protected static Main plugin;
     protected static Connection db;
     protected static Map<Integer, LandClaim> landClaims = new HashMap<>();
+    protected static Protections protections;
     protected static List<BlockProtection> blockProtections = new CopyOnWriteArrayList<>();
     protected static Menu landListMenu;
 
     public static Main getPlugin() { return plugin; }
 
     public static Connection getDB() { return db; }
+
+    public static Protections protections() { return protections; }
 
     /*
      Returns the first aka most significant ACL that can be found for the location
@@ -43,41 +46,7 @@ public class LandManager {
 
     public static BlockProtection getProtection(Block block) {
         Optional<BlockProtection> bpOption = blockProtections.stream().filter(p -> p.getBlock().equals(block)).findFirst();
-        if (bpOption.isPresent()) return bpOption.get();
-
-        try {
-            PreparedStatement st = getDB().prepareStatement("SELECT * FROM protections WHERE world=? AND x=? AND y=? AND z=?");
-            st.setString(1, block.getWorld().getName());
-            st.setInt(2, block.getX());
-            st.setInt(3, block.getY());
-            st.setInt(4, block.getZ());
-            ResultSet rs = st.executeQuery();
-            if (rs.next()) {
-                BlockProtection p = new BlockProtection(rs.getInt("protection_id"));
-
-                try {
-                    p.owner = UUID.fromString(rs.getString("owner"));
-                } catch (IllegalArgumentException e) {
-                    getPlugin().getLogger().log(Level.SEVERE, "Protection ID #" + rs.getInt("protection_id") + ": UUID \"" + rs.getString("owner") + "\" is not valid, Protection will not be loaded.");
-                    return null;
-                }
-
-                try {
-                    if (rs.getString("everyone_acl_level") != null)
-                        p.everyoneAccessLevel = ACL.Level.valueOf(rs.getString("everyone_acl_level"));
-                } catch (IllegalArgumentException e) {
-                    getPlugin().getLogger().log(Level.SEVERE, "Protection ID #" + rs.getInt("protection_id") + ": Value \"" + rs.getString("everyone_acl_level") + "\" is not valid, default Level will be used instead.");
-                }
-
-                p.block = block;
-
-                blockProtections.add(p);
-                return p;
-            }
-        } catch (SQLException e) {
-            getPlugin().getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to get block protection information.", e);
-        }
-        return null;
+        return bpOption.orElse(null);
     }
 
     public static BlockProtection createProtection(UUID owner, Block block) throws RestrictedWorldException {
@@ -85,12 +54,13 @@ public class LandManager {
             throw new RestrictedWorldException(block.getWorld(), "Unable to create Protection in this World as it is restricted by the configuration.", "You are not allowed to create a protection in this world.");
 
         try {
-            PreparedStatement st = getDB().prepareStatement("INSERT INTO `protections` (`world`, `x`, `y`, `z`, `owner`) VALUES (?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement st = getDB().prepareStatement("INSERT INTO `protections` (`world`, `chunk_loc`, `x`, `y`, `z`, `owner`) VALUES (?, ?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
             st.setString(1, block.getWorld().getName());
-            st.setInt(2, block.getX());
-            st.setInt(3, block.getY());
-            st.setInt(4, block.getZ());
-            st.setString(5, owner.toString());
+            st.setString(2, block.getChunk().getX() + ":" + block.getChunk().getZ());
+            st.setInt(3, block.getX());
+            st.setInt(4, block.getY());
+            st.setInt(5, block.getZ());
+            st.setString(6, owner.toString());
             st.executeUpdate();
             ResultSet rs = st.getGeneratedKeys();
             rs.next();

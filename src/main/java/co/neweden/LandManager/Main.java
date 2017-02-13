@@ -5,6 +5,7 @@ import co.neweden.LandManager.Commands.ProtectionCommands;
 import co.neweden.LandManager.Commands.UtilCommands;
 import co.neweden.LandManager.Listeners.*;
 import co.neweden.menugui.MenuGUI;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,13 +22,14 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         LandManager.plugin = this;
         new UtilCommands(); new LandCommands(); new ProtectionCommands();
-        new LocationEvents(); new InteractEvents(); new BlockEvents(); new MenuEvents(); new PlayerEvents();
+        new LocationEvents(); new InteractEvents(); new BlockEvents(); new MenuEvents(); new PlayerEvents(); new Protections();
+        LandManager.protections = new Protections();
         if (!startup()) getServer().getPluginManager().disablePlugin(this);
     }
 
     private boolean startup() {
         saveDefaultConfig();
-        if (!loadDBConnection() || !setupDB() || !loadClaims() || !setupMenu())
+        if (!loadDBConnection() || !setupDB() || !loadProtections() || !loadClaims() || !setupMenu())
             return false;
         getServer().getOnlinePlayers().forEach(LandManager::updatePlayerCache);
         return true;
@@ -78,6 +80,7 @@ public class Main extends JavaPlugin {
                     "CREATE TABLE IF NOT EXISTS `protections` (\n" +
                     "  `protection_id` INT NOT NULL AUTO_INCREMENT,\n" +
                     "  `world` VARCHAR(128) NULL,\n" +
+                    "  `chunk_loc` VARCHAR(64) NULL,\n" +
                     "  `x` INT NULL,\n" +
                     "  `y` INT NULL,\n" +
                     "  `z` INT NULL,\n" +
@@ -132,6 +135,16 @@ public class Main extends JavaPlugin {
             getLogger().log(Level.SEVERE, "Unable to setup database", e);
             return false;
         }
+        return true;
+    }
+
+    private boolean loadProtections() {
+        getServer().getWorlds().forEach(e -> {
+            getLogger().info("Loading Protections for world: " + e.getName());
+            for (Chunk c : e.getLoadedChunks()) {
+                LandManager.protections().loadAllForChunk(c);
+            }
+        });
         return true;
     }
 
