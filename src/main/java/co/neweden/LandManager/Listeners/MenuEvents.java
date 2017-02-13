@@ -17,6 +17,10 @@ import java.util.*;
 
 public class MenuEvents implements Listener {
 
+    public MenuEvents() {
+        Bukkit.getPluginManager().registerEvents(this, LandManager.getPlugin());
+    }
+
     public static Map<UUID, OfflinePlayer> landListMenuSubjects = new HashMap<>();
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)

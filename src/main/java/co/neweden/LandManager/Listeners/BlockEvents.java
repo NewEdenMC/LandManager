@@ -2,6 +2,7 @@ package co.neweden.LandManager.Listeners;
 
 import co.neweden.LandManager.*;
 import co.neweden.LandManager.Exceptions.RestrictedWorldException;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -22,6 +23,10 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class BlockEvents implements Listener {
+
+    public BlockEvents() {
+        Bukkit.getPluginManager().registerEvents(this, LandManager.getPlugin());
+    }
 
     private void handleBlockMove(Cancellable event, Block from, Block to) {
         LandClaim fromLand = LandManager.getLandClaim(from.getChunk());

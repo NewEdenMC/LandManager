@@ -21,11 +21,7 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         LandManager.plugin = this;
         new UtilCommands(); new LandCommands(); new ProtectionCommands();
-        getServer().getPluginManager().registerEvents(new LocationEvents(), this);
-        getServer().getPluginManager().registerEvents(new InteractEvents(), this);
-        getServer().getPluginManager().registerEvents(new BlockEvents(), this);
-        getServer().getPluginManager().registerEvents(new MenuEvents(), this);
-        getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
+        new LocationEvents(); new InteractEvents(); new BlockEvents(); new MenuEvents(); new PlayerEvents();
         if (!startup()) getServer().getPluginManager().disablePlugin(this);
     }
 

@@ -1,6 +1,7 @@
 package co.neweden.LandManager.Listeners;
 
 import co.neweden.LandManager.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -19,6 +20,10 @@ import java.util.Collection;
 import java.util.HashSet;
 
 public class InteractEvents implements Listener {
+
+    public InteractEvents() {
+        Bukkit.getPluginManager().registerEvents(this, LandManager.getPlugin());
+    }
 
     private void handleEvent(Location targetLocation, Cancellable event, Entity callingEntity) {
         ACL acl = LandManager.getFirstACL(targetLocation);

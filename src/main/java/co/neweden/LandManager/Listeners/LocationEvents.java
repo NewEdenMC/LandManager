@@ -13,6 +13,10 @@ import org.bukkit.event.player.*;
 
 public class LocationEvents implements Listener {
 
+    public LocationEvents() {
+        Bukkit.getPluginManager().registerEvents(this, LandManager.getPlugin());
+    }
+
     private enum EventResponse { NO_ACTION, SUCCESS, CANCELED }
 
     private EventResponse handleEvent(PlayerEvent callingEvent, Chunk fromChunk, Chunk toChunk, boolean onCancelGoToWorldSpawn) {
