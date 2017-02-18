@@ -2,12 +2,14 @@ package co.neweden.LandManager;
 
 import co.neweden.LandManager.Exceptions.RestrictedWorldException;
 import org.bukkit.*;
-import org.bukkit.block.Block;
+import org.bukkit.block.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.material.Door;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,7 +34,11 @@ public class Protections implements Listener {
     public boolean isWorldRestricted(World world) { return LandManager.isWorldRestricted("protections", world); }
 
     public BlockProtection get(Block block) {
-        Optional<BlockProtection> bpOption = blockProtections.stream().filter(p -> p.getBlock().equals(block)).findFirst();
+        final Block b1 = block;
+        Block adjacent = Util.getAdjacentBlock(block);
+        final Block b2 = (adjacent != null) ? adjacent : block;
+        Optional<BlockProtection> bpOption = blockProtections.stream()
+                .filter(p -> p.getBlock().equals(b1) || p.getBlock().equals(b2)).findFirst();
         return bpOption.orElse(null);
     }
 

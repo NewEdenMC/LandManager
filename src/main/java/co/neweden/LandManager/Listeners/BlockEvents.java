@@ -4,8 +4,11 @@ import co.neweden.LandManager.*;
 import co.neweden.LandManager.Exceptions.RestrictedWorldException;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -16,6 +19,7 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.world.StructureGrowEvent;
+import org.bukkit.material.Door;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -90,10 +94,38 @@ public class BlockEvents implements Listener {
             return;
         }
 
+        if (processUpdateForMultiBlockProtection(event.getPlayer(), event.getBlock(), p)) return;
+
         if (LandManager.protections().delete(p))
             event.getPlayer().sendMessage(Util.formatString("&aThis block was protected, the protection has now been removed."));
         else
             event.getPlayer().sendMessage(Util.formatString("&cThis block was protected, there was a problem removing the protection, please contact a staff member."));
+    }
+
+    /*
+     For protections associated with multiple blocks, returns true if removal of the protection should be stopped,
+     false if it should continue
+     */
+    private boolean processUpdateForMultiBlockProtection(Player player, Block block, Protection p) {
+        // must be a chest and must be a block protection to swap protection block, otherwise removal should continue
+        if (!block.getType().equals(Material.CHEST) || !(p instanceof BlockProtection)) return false;
+        BlockProtection bp = (BlockProtection) p;
+        // If the block relating to the protection is different from the one being broken we don't need to do anything
+        // e.g. if the left side of a double chest is being broken but the right side holds the protection, breaking
+        // the left side effects nothing, return true to prevent the protection being removed
+        if (!block.equals(bp.getBlock())) return true;
+        Block adjacent = Util.getAdjacentBlock(block);
+        // Return if there are no adjacent blocks removal should continue
+        if (adjacent == null) return false;
+
+        try {
+            // If the block being broken holds the protection switch the block to the adjacent block
+            if (!bp.setBlock(adjacent))
+                player.sendMessage(Util.formatString("&cThere was a problem moving the protection to the adjacent block, please contact a staff member."));
+        } catch (RestrictedWorldException e) {
+            return false; // There's no way an adjacent block spans two worlds, that's just crazy talk
+        }
+        return true;
     }
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)

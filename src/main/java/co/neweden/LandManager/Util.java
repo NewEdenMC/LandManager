@@ -3,6 +3,8 @@ package co.neweden.LandManager;
 import com.mojang.api.profiles.HttpProfileRepository;
 import com.mojang.api.profiles.Profile;
 import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -86,6 +88,17 @@ public class Util {
             return Bukkit.getOfflinePlayer(UUID.fromString(uuid));
         } else
             return null;
+    }
+
+    public static Block getAdjacentBlock(Block block) {
+        BlockFace[] faces = new BlockFace[]{BlockFace.DOWN, BlockFace.UP, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
+        for (BlockFace face : faces) {
+            Block adjacentBlock = block.getRelative(face);
+            if (adjacentBlock.getType().equals(block.getType())) {
+                return adjacentBlock;
+            }
+        }
+        return null;
     }
 
 }
