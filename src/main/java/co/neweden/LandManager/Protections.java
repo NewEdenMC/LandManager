@@ -40,6 +40,15 @@ public class Protections implements Listener {
         return bpOption.orElse(null);
     }
 
+    public Collection<Protection> getSurroundingProtections(Block block) {
+        return blockProtections.stream()
+                .filter(e ->
+                            (block.getX() - 1 == e.getBlock().getX() || block.getX() == e.getBlock().getX() || block.getX() + 1 == e.getBlock().getX()) &&
+                            (block.getY() - 1 == e.getBlock().getY() || block.getY() == e.getBlock().getY() || block.getY() + 1 == e.getBlock().getY()) &&
+                            (block.getZ() - 1 == e.getBlock().getZ() || block.getZ() == e.getBlock().getZ() || block.getZ() + 1 == e.getBlock().getZ())
+                ).collect(Collectors.toSet());
+    }
+
     public BlockProtection create(UUID owner, Block block) throws RestrictedWorldException {
         if (isWorldRestricted(block.getWorld()))
             throw new RestrictedWorldException(block.getWorld(), "Unable to create Protection in this World as it is restricted by the configuration.", "You are not allowed to create a protection in this world.");
