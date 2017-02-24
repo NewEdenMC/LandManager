@@ -1,6 +1,6 @@
 package co.neweden.LandManager;
 
-import org.bukkit.entity.Player;
+import org.bukkit.entity.HumanEntity;
 
 import java.util.*;
 
@@ -12,16 +12,16 @@ public abstract class ACL {
 
     public boolean testAccessLevel(UUID uuid, Level needed) { return testAccessLevel(getAccessLevel(uuid).level, needed); }
 
-    public boolean testAccessLevel(Player player, Level needed, Collection<String> bypassPermissions) {
+    public boolean testAccessLevel(HumanEntity human, Level needed, Collection<String> bypassPermissions) {
         boolean hasall = true;
         for (String p : bypassPermissions) {
-            if (!player.hasPermission(p)) hasall = false;
+            if (!human.hasPermission(p)) hasall = false;
         }
-        return (testAccessLevel(player.getUniqueId(), needed) || hasall);
+        return (testAccessLevel(human.getUniqueId(), needed) || hasall);
     }
 
-    public boolean testAccessLevel(Player player, Level needed, String bypassPermission) {
-        return (testAccessLevel(player.getUniqueId(), needed) || player.hasPermission(bypassPermission));
+    public boolean testAccessLevel(HumanEntity human, Level needed, String bypassPermission) {
+        return (testAccessLevel(human.getUniqueId(), needed) || human.hasPermission(bypassPermission));
     }
 
     public static boolean testAccessLevel(Level hasLevel, Level needed) {
