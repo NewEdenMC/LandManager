@@ -31,7 +31,7 @@ public class ACLCommandHandlers {
 
         switch (args[0].toLowerCase()) {
             case "add":
-            case "set": setCommand(acl, player, args); break;
+            case "set": setCommand(acl, player, args, typeName); break;
             case "remove": removeCommand(acl, player, args); break;
             default:
                 player.sendMessage(Util.formatString("&cUnknown sub-command " + args[0] + "\n \n"));
@@ -49,7 +49,7 @@ public class ACLCommandHandlers {
         );
     }
 
-    private static void setCommand(ACL acl, Player player, String[] args) {
+    private static void setCommand(ACL acl, Player player, String[] args, String typeName) {
         if (args.length < 2)
             throw new CommandException("&cYou did not specify a player to add to the Access List.");
 
@@ -61,8 +61,8 @@ public class ACLCommandHandlers {
         ACL.Level level = ACL.Level.MODIFY;
         if (args.length >= 3) {
             level = ACL.Level.valueOf(args[2].toUpperCase());
-            if (!level.equals(ACL.Level.INTERACT) && !level.equals(ACL.Level.MODIFY))
-                throw new CommandException("&cThe ACL Level \"" + args[2] + "\" is not valid or is not allowed, allowed levels are: INTERACT, MODIFY");
+            if (level.equals(ACL.Level.FULL_ACCESS))
+                throw new CommandException("&cThe ACL Level \"" + args[2] + "\" is not valid or is not allowed, allowed levels are: NO_ACCESS, VIEW, INTERACT, MODIFY. Note that only the owner of this " + typeName + " can have FULL_ACCESS.");
         }
 
         if (acl.setAccess(addPlayer.getUniqueId(), level))
