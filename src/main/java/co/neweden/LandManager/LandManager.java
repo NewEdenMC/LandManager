@@ -194,9 +194,7 @@ public class LandManager {
                 String perm = permInfo.getPermission();
 
                 if (perm.length() < 23) continue;
-                System.out.print(perm);
                 if (!perm.substring(0, 23).equalsIgnoreCase("landmanager.claimlimit.")) continue;
-                System.out.print(perm);
 
                 try {
                     int plimit = Integer.parseInt(perm.substring(23));
