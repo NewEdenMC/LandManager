@@ -6,6 +6,8 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.material.Door;
+import org.bukkit.material.MaterialData;
 
 import java.util.UUID;
 import java.util.logging.Level;
@@ -90,14 +92,28 @@ public class Util {
             return null;
     }
 
-    public static Block getAdjacentBlock(Block block) {
-        BlockFace[] faces = new BlockFace[]{BlockFace.DOWN, BlockFace.UP, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
-        for (BlockFace face : faces) {
-            Block adjacentBlock = block.getRelative(face);
-            if (adjacentBlock.getType().equals(block.getType())) {
-                return adjacentBlock;
+    public static Block getJoiningBlock(Block block) {
+        if (block.getType().equals(Material.CHEST)) {
+            BlockFace[] faces = new BlockFace[]{BlockFace.DOWN, BlockFace.UP, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
+            for (BlockFace face : faces) {
+                Block faceBlock = block.getRelative(face);
+                if (!faceBlock.getType().equals(Material.CHEST)) continue;
+                return faceBlock;
             }
         }
+
+        if (block.getState().getData() instanceof Door) {
+            Door door = (Door) block.getState().getData();
+            Block joining;
+            if (door.isTopHalf()) // Get the joining Block to "block", as in get the top or bottom part of the Door
+                joining = block.getRelative(BlockFace.DOWN);
+            else
+                joining = block.getRelative(BlockFace.UP);
+            // Make sure the joining Block is actually a Door (in the odd case where we only have half a Door)
+            // if so return the joining Block, else return null
+            return (joining.getState().getData() instanceof Door) ? joining : null;
+        }
+
         return null;
     }
 

@@ -33,8 +33,8 @@ public class Protections implements Listener {
 
     public BlockProtection get(Block block) {
         final Block b1 = block;
-        Block adjacent = Util.getAdjacentBlock(block);
-        final Block b2 = (adjacent != null) ? adjacent : block;
+        Block joining = Util.getJoiningBlock(block);
+        final Block b2 = (joining != null) ? joining : block;
         Optional<BlockProtection> bpOption = blockProtections.stream()
                 .filter(p -> p.getBlock().equals(b1) || p.getBlock().equals(b2)).findFirst();
         return bpOption.orElse(null);

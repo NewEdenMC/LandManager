@@ -114,7 +114,7 @@ public class BlockEvents implements Listener {
         // e.g. if the left side of a double chest is being broken but the right side holds the protection, breaking
         // the left side effects nothing, return true to prevent the protection being removed
         if (!block.equals(bp.getBlock())) return true;
-        Block adjacent = Util.getAdjacentBlock(block);
+        Block adjacent = Util.getJoiningBlock(block);
         // Return if there are no adjacent blocks removal should continue
         if (adjacent == null) return false;
 
