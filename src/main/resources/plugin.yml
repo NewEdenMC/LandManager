@@ -109,6 +109,7 @@ permissions:
       description: Gives moderator permissions to manage protections
       children:
          landmanager.unlock.any: true
+         landmanager.protection.viewany: true
          landmanager.protection.interactany: true
          landmanager.pinfo.any: true
          landmanager.ptransfer.any: true
@@ -155,6 +156,8 @@ permissions:
       description: Permission to use /unlock command on any protection regardless of ACL Level
    landmanager.protection.interactany:
       description: Permission to interact with any Protection regardless of ACL Level
+   landmanager.protection.viewany:
+      description: Permission to view with any Protection regardless of ACL Level
    landmanager.pinfo:
       description: Permission to use /pinfo command
    landmanager.pinfo.any:
