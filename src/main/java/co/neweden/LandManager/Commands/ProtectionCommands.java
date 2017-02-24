@@ -111,11 +111,16 @@ public class ProtectionCommands implements CommandExecutor, Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onBlockPlace(BlockPlaceEvent event) {
+    public void autoProtectListener(BlockPlaceEvent event) {
         Block block = event.getBlock();
-        if (!LandManager.protections().isWorldRestricted(block.getWorld()) &&
-                LandManager.protections().canBlockAutoProtect(block.getType()))
-            protectCommand(event.getPlayer(), block);
+        try {
+            if (LandManager.protections().get(block) == null &&
+                    !LandManager.protections().isWorldRestricted(block.getWorld()) &&
+                    LandManager.protections().canBlockAutoProtect(block.getType()))
+                protectCommand(event.getPlayer(), block);
+        } catch (CommandException e) {
+            event.getPlayer().sendMessage(Util.formatString(e.getMessage()));
+        }
     }
 
     private void protectCommand(Player player, Block block) {
