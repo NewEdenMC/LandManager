@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /*
- An implementation of HashSet specifically designed for making handling
+ An implementation of TreeSet specifically designed for making handling
  Access Control Lists easier.
 
  Adding/removing ACL entries here does not modify the underlying Access
