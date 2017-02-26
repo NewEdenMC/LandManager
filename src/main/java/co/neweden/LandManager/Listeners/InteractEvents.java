@@ -99,10 +99,10 @@ public class InteractEvents implements Listener {
         InventoryHolder ih = event.getInventory().getHolder();
         if (!(ih instanceof BlockState)) return;
 
-        Protection p = LandManager.protections().get(((BlockState) ih).getBlock());
-        if (p == null) return;
+        ACL acl = LandManager.getFirstACL(((BlockState) ih).getLocation());
+        if (acl == null) return;
 
-        if (p.testAccessLevel(event.getWhoClicked(), ACL.Level.INTERACT, "landmanager.protection.interactany")) return;
+        if (acl.testAccessLevel(event.getWhoClicked(), ACL.Level.INTERACT, "landmanager.protection.interactany")) return;
 
         event.getWhoClicked().sendMessage(Util.formatString("&cYou do not permission to interact with this Protection"));
         event.setCancelled(true);
