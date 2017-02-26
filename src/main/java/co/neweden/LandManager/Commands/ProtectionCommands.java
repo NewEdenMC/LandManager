@@ -1,10 +1,7 @@
 package co.neweden.LandManager.Commands;
 
-import co.neweden.LandManager.ACL;
+import co.neweden.LandManager.*;
 import co.neweden.LandManager.Exceptions.UserException;
-import co.neweden.LandManager.LandManager;
-import co.neweden.LandManager.Protection;
-import co.neweden.LandManager.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
@@ -150,7 +147,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         String status = "&7Not Protected";
         String owner = "";
         String canProtect = "&ayes";
-        String acl = "- &7EVERYONE (FULL_ACCESS)";
+        ACLSet acl = null;
 
         Protection protection = LandManager.protections().get(block);
         if (protection != null) {
@@ -159,7 +156,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
 
             status = "&aProtected";
             owner = Bukkit.getOfflinePlayer(protection.getOwner()).getName();
-            acl = ACLCommandHandlers.renderACL(protection);
+            acl = protection.getACL();
         }
 
         if (!LandManager.protections().canBlockBeProtected(block.getType()))
@@ -169,7 +166,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
                 "Protection status: " + status + "&r\n" +
                 "Protection owned by: " + owner + "&r\n" +
                 "Can block type " + block.getType().toString().toLowerCase() + " be protected: " + canProtect + "&r\n" +
-                "Access Control List:\n" + acl
+                "Access Control List:\n" + ACLCommandHandlers.renderACL(acl)
         ));
     }
 

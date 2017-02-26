@@ -1,13 +1,10 @@
 package co.neweden.LandManager.Commands;
 
-import co.neweden.LandManager.ACL;
+import co.neweden.LandManager.*;
 import co.neweden.LandManager.Exceptions.RestrictedWorldException;
 import co.neweden.LandManager.Exceptions.UnclaimChunkException;
 import co.neweden.LandManager.Exceptions.UserException;
-import co.neweden.LandManager.LandClaim;
-import co.neweden.LandManager.LandManager;
 import co.neweden.LandManager.Listeners.MenuEvents;
-import co.neweden.LandManager.Util;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
@@ -208,7 +205,7 @@ public class LandCommands implements CommandExecutor {
         String status = "&7Not Claimed";
         String name = "";
         String owner = "";
-        String acl = "- &7EVERYONE (FULL_ACCESS)";
+        ACLSet acl = null;
 
         if (LandManager.isChunkClaimed(player.getLocation().getChunk())) {
             LandClaim land = LandManager.getLandClaim(player.getLocation().getChunk());
@@ -219,14 +216,14 @@ public class LandCommands implements CommandExecutor {
             status = "&aClaimed";
             name = land.getDisplayName();
             owner = Bukkit.getOfflinePlayer(land.getOwner()).getName();
-            acl = ACLCommandHandlers.renderACL(land);
+            acl = land.getACL();
         }
 
         player.sendMessage(Util.formatString(
                 "Chunk status: " + status + "&r\n" +
                 "Land Name: " + name + "&r\n" +
                 "Land owned by: " + owner + "&r\n\n" +
-                "Access Control List:\n" + acl
+                "Access Control List:\n" + ACLCommandHandlers.renderACL(acl)
         ));
     }
 

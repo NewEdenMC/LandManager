@@ -2,6 +2,7 @@ package co.neweden.LandManager.Commands;
 
 import co.neweden.LandManager.ACL;
 import co.neweden.LandManager.ACLEntry;
+import co.neweden.LandManager.ACLSet;
 import co.neweden.LandManager.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -10,9 +11,13 @@ import org.bukkit.entity.Player;
 
 public class ACLCommandHandlers {
 
-    protected static String renderACL(ACL acl) {
+    protected static String renderACL(ACLSet acl) {
+        if (acl == null) {
+            return "- &7EVERYONE (" + ACL.Level.FULL_ACCESS + ")";
+        }
+
         String render = "";
-        for (ACLEntry entry : acl.getACL()) {
+        for (ACLEntry entry : acl) {
             if (entry.uuid != null)
                 render += "- " + Bukkit.getOfflinePlayer(entry.uuid).getName() + " (" + entry.level + ")";
             else
