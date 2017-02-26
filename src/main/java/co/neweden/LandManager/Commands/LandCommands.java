@@ -223,7 +223,7 @@ public class LandCommands implements CommandExecutor {
                 "Chunk status: " + status + "&r\n" +
                 "Land Name: " + name + "&r\n" +
                 "Land owned by: " + owner + "&r\n\n" +
-                "Access Control List:\n" + ACLCommandHandlers.renderACL(acl)
+                "Access Control List:\n" + ACLCommandHandlers.renderACL(acl, false)
         ));
     }
 

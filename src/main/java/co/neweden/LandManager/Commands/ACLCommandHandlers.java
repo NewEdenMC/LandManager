@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 public class ACLCommandHandlers {
 
-    protected static String renderACL(ACLSet acl) {
+    protected static String renderACL(ACLSet acl, boolean aclInherited) {
         if (acl == null) {
             return "- &7EVERYONE (" + ACL.Level.FULL_ACCESS + ")";
         }
@@ -22,7 +22,7 @@ public class ACLCommandHandlers {
                 render += "- " + Bukkit.getOfflinePlayer(entry.uuid).getName() + " (" + entry.level + ")";
             else
                 render += "- &7EVERYONE (" + entry.level + ")";
-            render += (entry.inherited) ? " &e*&r\n" : "&r\n";
+            render += (entry.inherited || aclInherited) ? " &e*&r\n" : "&r\n";
         }
         return render;
     }

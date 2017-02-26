@@ -148,6 +148,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         String owner = "";
         String canProtect = "&ayes";
         ACLSet acl = null;
+        boolean aclInherited = false;
 
         Protection protection = LandManager.protections().get(block);
         if (protection != null) {
@@ -157,6 +158,12 @@ public class ProtectionCommands implements CommandExecutor, Listener {
             status = "&aProtected";
             owner = Bukkit.getOfflinePlayer(protection.getOwner()).getName();
             acl = protection.getACL();
+        } else {
+            ACL parent = LandManager.getFirstACL(block.getLocation());
+            if (parent != null) {
+                acl = parent.getACL();
+                aclInherited = true;
+            }
         }
 
         if (!LandManager.protections().canBlockBeProtected(block.getType()))
@@ -166,7 +173,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
                 "Protection status: " + status + "&r\n" +
                 "Protection owned by: " + owner + "&r\n" +
                 "Can block type " + block.getType().toString().toLowerCase() + " be protected: " + canProtect + "&r\n" +
-                "Access Control List:\n" + ACLCommandHandlers.renderACL(acl)
+                "Access Control List:\n" + ACLCommandHandlers.renderACL(acl, aclInherited)
         ));
     }
 
