@@ -163,6 +163,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
             if (parent != null) {
                 acl = parent.getACL();
                 aclInherited = true;
+                status = "&eNot registered, inherited from Land Claim";
             }
         }
 
