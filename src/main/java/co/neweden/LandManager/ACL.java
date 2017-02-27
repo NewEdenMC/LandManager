@@ -8,7 +8,7 @@ public abstract class ACL {
 
     protected ACLSet list = new ACLSet();
 
-    public enum Level { NO_ACCESS, VIEW, INTERACT, MODIFY, FULL_ACCESS }
+    public enum Level { NO_ACCESS, ENTER, VIEW, INTERACT, MODIFY, FULL_ACCESS }
 
     public boolean testAccessLevel(UUID uuid, Level needed) { return testAccessLevel(getAccessLevel(uuid).level, needed); }
 
@@ -27,22 +27,27 @@ public abstract class ACL {
     public static boolean testAccessLevel(Level hasLevel, Level needed) {
         // Convert "hasLevel" to integers for comparison
         int hasNum = 0;
-        if (hasLevel.equals(Level.VIEW)) hasNum = 1;
-        if (hasLevel.equals(Level.INTERACT)) hasNum = 2;
-        if (hasLevel.equals(Level.MODIFY)) hasNum = 3;
-        if (hasLevel.equals(Level.FULL_ACCESS)) hasNum = 4;
+        if (hasLevel.equals(Level.ENTER)) hasNum = 1;
+        if (hasLevel.equals(Level.VIEW)) hasNum = 2;
+        if (hasLevel.equals(Level.INTERACT)) hasNum = 3;
+        if (hasLevel.equals(Level.MODIFY)) hasNum = 4;
+        if (hasLevel.equals(Level.FULL_ACCESS)) hasNum = 5;
 
         // check the minimum access level required, and pass if "needed" equals or is greater than "hasLevel"
         switch (needed) {
-            case FULL_ACCESS: return (hasNum >= 4);
-            case MODIFY: return (hasNum >= 3);
-            case INTERACT: return (hasNum >= 2);
-            case VIEW: return (hasNum >= 1);
+            case FULL_ACCESS: return (hasNum >= 5);
+            case MODIFY: return (hasNum >= 4);
+            case INTERACT: return (hasNum >= 3);
+            case VIEW: return (hasNum >= 2);
+            case ENTER: return (hasNum >= 1);
             case NO_ACCESS: return true;
             default: return false;
         }
     }
 
+    /*
+     Overridden in FallbackACL class
+     */
     public ACLSet getACL() {
         ACLSet acl = new ACLSet();
         if (getParentACL() != null) {

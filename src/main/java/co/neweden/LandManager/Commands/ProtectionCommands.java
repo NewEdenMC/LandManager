@@ -147,25 +147,16 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         String status = "&7Not Protected";
         String owner = "";
         String canProtect = "&ayes";
-        ACLSet acl = null;
-        boolean aclInherited = false;
 
-        Protection protection = LandManager.protections().get(block);
-        if (protection != null) {
-            if (!protection.testAccessLevel(player, ACL.Level.VIEW, "landmanager.pinfo.any"))
-                throw new CommandException("&cThis is protected but you do not have permission to view the protection Info.");
+        ACL acl = LandManager.protections().getACL(block);
+        if (!acl.testAccessLevel(player, ACL.Level.VIEW, "landmanager.pinfo.any"))
+            throw new CommandException("&cThis is protected but you do not have permission to view the protection Info.");
 
+        if (acl instanceof Protection) {
             status = "&aProtected";
-            owner = Bukkit.getOfflinePlayer(protection.getOwner()).getName();
-            acl = protection.getACL();
-        } else {
-            ACL parent = LandManager.getFirstACL(block.getLocation());
-            if (parent != null) {
-                acl = parent.getACL();
-                aclInherited = true;
-                status = "&eNot registered, inherited from Land Claim";
-            }
-        }
+            owner = Bukkit.getOfflinePlayer(acl.getOwner()).getName();
+        } else if (acl instanceof FallbackACL)
+            status = "&eNot registered, inherited from Land Claim";
 
         if (!LandManager.protections().canBlockBeProtected(block.getType()))
             canProtect = "&cno";
@@ -174,7 +165,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
                 "Protection status: " + status + "&r\n" +
                 "Protection owned by: " + owner + "&r\n" +
                 "Can block type " + block.getType().toString().toLowerCase() + " be protected: " + canProtect + "&r\n" +
-                "Access Control List:\n" + ACLCommandHandlers.renderACL(acl, aclInherited)
+                "Access Control List:\n" + ACLCommandHandlers.renderACL(acl.getACL())
         ));
     }
 

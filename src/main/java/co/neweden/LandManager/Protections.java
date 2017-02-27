@@ -94,15 +94,21 @@ public class Protections implements Listener {
         return p;
     }
 
+    public ACL getACL(Block block) {
+        Protection p = get(block);
+        if (p != null)
+            return p;
+        else
+            return new FallbackACL(LandManager.getLandClaim(block.getChunk()));
+    }
+
     public BlockProtection create(UUID owner, Block block) throws RestrictedWorldException, ProtectionAlreadyExistsException {
         if (isWorldRestricted(block.getWorld()))
             throw new RestrictedWorldException(block.getWorld(), "Unable to create Protection in this World as it is restricted by the configuration.", "You are not allowed to create a protection in this world.");
 
-        ACL parent = LandManager.getFirstACL(block.getLocation());
-        if (parent != null) {
-            if (parent instanceof Protection)
-                throw new ProtectionAlreadyExistsException((Protection) parent, "Unable to create Protection as a Protection already exists for the Block at the Location: x=" + block.getX() + " y=" + block.getType() + " z=" + block.getZ(), "Cannot protect this block as it is already protected.");
-        }
+        ACL current = LandManager.protections.getACL(block);
+        if (current instanceof Protection)
+            throw new ProtectionAlreadyExistsException((Protection) current, "Unable to create Protection as a Protection already exists for the Block at the Location: x=" + block.getX() + " y=" + block.getType() + " z=" + block.getZ(), "Cannot protect this block as it is already protected.");
 
         try {
             PreparedStatement st = LandManager.getDB().prepareStatement("INSERT INTO `protections` (`world`, `x`, `y`, `z`, `owner`) VALUES (?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS);

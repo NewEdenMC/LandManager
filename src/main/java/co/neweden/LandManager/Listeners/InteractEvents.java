@@ -33,8 +33,10 @@ public class InteractEvents implements Listener {
         handleEvent(targetLocation, event, callingEntity, ACL.Level.INTERACT, "interactany");
     }
     private void handleEvent(Location targetLocation, Cancellable event, Entity callingEntity, ACL.Level needed, String bypassPermSuffix) {
-        ACL acl = LandManager.getFirstACL(targetLocation);
-        if (acl == null || callingEntity == null) return; // callingEntity may sometimes be null
+        ACL acl = LandManager.protections().getACL(targetLocation.getBlock());
+
+        if (callingEntity == null) return; // callingEntity may sometimes be null
+
         if (!(callingEntity instanceof Player)) return;
         Player player = (Player) callingEntity;
 
@@ -44,7 +46,7 @@ public class InteractEvents implements Listener {
             bperm = "landmanager.protection." + bypassPermSuffix;
             typeName = "Protection";
         }
-        if (acl instanceof LandClaim) {
+        if (acl instanceof FallbackACL && acl.getParentACL() instanceof LandClaim) {
             bperm = "landmanager.land." + bypassPermSuffix;
             typeName = "Land Claim";
         }
@@ -99,12 +101,12 @@ public class InteractEvents implements Listener {
         InventoryHolder ih = event.getInventory().getHolder();
         if (!(ih instanceof BlockState)) return;
 
-        ACL acl = LandManager.getFirstACL(((BlockState) ih).getLocation());
-        if (acl == null) return;
+        ACL acl = LandManager.protections().getACL(((BlockState) ih).getLocation().getBlock());
 
-        if (acl.testAccessLevel(event.getWhoClicked(), ACL.Level.INTERACT, "landmanager.protection.interactany")) return;
+        if (acl.testAccessLevel(event.getWhoClicked(), ACL.Level.INTERACT, "landmanager.protection.interactany"))
+            return;
 
-        event.getWhoClicked().sendMessage(Util.formatString("&cYou do not permission to interact with this Protection"));
+        event.getWhoClicked().sendMessage(Util.formatString("&cYou do not have permission to interact with this Protection"));
         event.setCancelled(true);
     }
 

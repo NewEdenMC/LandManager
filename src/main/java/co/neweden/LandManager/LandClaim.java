@@ -90,7 +90,7 @@ public class LandClaim extends ACL {
 
     public Level getEveryoneAccessLevel() {
         if (everyoneAccessLevel == null)
-            return Level.VIEW;
+            return Level.ENTER;
         else
             return everyoneAccessLevel;
     }

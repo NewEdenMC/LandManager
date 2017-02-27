@@ -137,8 +137,7 @@ public class BlockEvents implements Listener {
     public void onBlockExplode(BlockExplodeEvent event) { handleCheckBlocks(event, event.blockList()); }
 
     private void handleEveryoneAccessCheck(Cancellable event, Location loc) {
-        ACL acl = LandManager.getFirstACL(loc);
-        if (acl == null) return;
+        ACL acl = LandManager.protections().getACL(loc.getBlock());
         if (!ACL.testAccessLevel(acl.getEveryoneAccessLevel(), ACL.Level.INTERACT))
             event.setCancelled(true);
     }

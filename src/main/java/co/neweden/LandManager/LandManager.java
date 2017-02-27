@@ -30,19 +30,6 @@ public class LandManager {
 
     public static Protections protections() { return protections; }
 
-    /*
-     Returns the first aka most significant ACL that can be found for the location
-     Starting by checking for a protection, then if none looking for a land claim
-     */
-    public static ACL getFirstACL(Location loc) {
-        // Check and return a protection if not null
-        Protection p = protections().get(loc.getBlock());
-        if (p != null) return p;
-        // Check and return LandClaim if not null
-        LandClaim l = getLandClaim(loc.getChunk());
-        if (l != null) return l; else return null;
-    }
-
     public static Menu getLandListMenu() { return landListMenu; }
 
     public static Collection<LandClaim> getLandClaims() { return new HashSet<>(landClaims.values()); }

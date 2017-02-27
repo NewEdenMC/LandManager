@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 public class ACLCommandHandlers {
 
-    protected static String renderACL(ACLSet acl, boolean aclInherited) {
+    protected static String renderACL(ACLSet acl) {
         if (acl == null) {
             return "- &7EVERYONE (" + ACL.Level.FULL_ACCESS + ")";
         }
@@ -22,7 +22,7 @@ public class ACLCommandHandlers {
                 render += "- " + Bukkit.getOfflinePlayer(entry.uuid).getName() + " (" + entry.level + ")";
             else
                 render += "- &7EVERYONE (" + entry.level + ")";
-            render += (entry.inherited || aclInherited) ? " &e*&r\n" : "&r\n";
+            render += (entry.inherited) ? " &e*&r\n" : "&r\n";
         }
         return render;
     }
@@ -67,7 +67,7 @@ public class ACLCommandHandlers {
         if (args.length >= 3) {
             level = ACL.Level.valueOf(args[2].toUpperCase());
             if (level.equals(ACL.Level.FULL_ACCESS))
-                throw new CommandException("&cThe ACL Level \"" + args[2] + "\" is not valid or is not allowed, allowed levels are: NO_ACCESS, VIEW, INTERACT, MODIFY. Note that only the owner of this " + typeName + " can have FULL_ACCESS.");
+                throw new CommandException("&cThe ACL Level \"" + args[2] + "\" is not valid or is not allowed, allowed levels are: NO_ACCESS, ENTER, VIEW, INTERACT, MODIFY. Note that only the owner of this " + typeName + " can have FULL_ACCESS.");
         }
 
         if (acl.setAccess(addPlayer.getUniqueId(), level))

@@ -41,7 +41,7 @@ public class LocationEvents implements Listener {
         if (toLand != null) {
             PlayerEnterLandClaimEvent enterEvent = new PlayerEnterLandClaimEvent(toLand, callingEvent.getPlayer());
 
-            if (!toLand.testAccessLevel(callingEvent.getPlayer().getUniqueId(), ACL.Level.VIEW) && !callingEvent.getPlayer().hasPermission("landmanager.enterany")) {
+            if (!toLand.testAccessLevel(callingEvent.getPlayer().getUniqueId(), ACL.Level.ENTER) && !callingEvent.getPlayer().hasPermission("landmanager.enterany")) {
                 enterEvent.setCancelled(true);
             }
 
