@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.material.Door;
 import org.bukkit.material.MaterialData;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -94,7 +96,7 @@ public class Util {
 
     public static Block getJoiningBlock(Block block) {
         if (block.getType().equals(Material.CHEST)) {
-            BlockFace[] faces = new BlockFace[]{BlockFace.DOWN, BlockFace.UP, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
+            BlockFace[] faces = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
             for (BlockFace face : faces) {
                 Block faceBlock = block.getRelative(face);
                 if (!faceBlock.getType().equals(Material.CHEST)) continue;
