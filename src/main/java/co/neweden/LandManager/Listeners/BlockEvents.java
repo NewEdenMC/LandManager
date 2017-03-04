@@ -108,7 +108,7 @@ public class BlockEvents implements Listener {
      */
     private boolean processUpdateForMultiBlockProtection(Player player, Block block, Protection p) {
         // must be a chest and must be a block protection to swap protection block, otherwise removal should continue
-        if (!block.getType().equals(Material.CHEST) || !(p instanceof BlockProtection)) return false;
+        if (!Util.getHorizontalJoiningBlockType().contains(block.getType()) || !(p instanceof BlockProtection)) return false;
         BlockProtection bp = (BlockProtection) p;
         // If the block relating to the protection is different from the one being broken we don't need to do anything
         // e.g. if the left side of a double chest is being broken but the right side holds the protection, breaking

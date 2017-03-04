@@ -95,11 +95,11 @@ public class Util {
     }
 
     public static Block getJoiningBlock(Block block) {
-        if (block.getType().equals(Material.CHEST)) {
+        if (getHorizontalJoiningBlockType().contains(block.getType())) {
             BlockFace[] faces = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
             for (BlockFace face : faces) {
                 Block faceBlock = block.getRelative(face);
-                if (!faceBlock.getType().equals(Material.CHEST)) continue;
+                if (!getHorizontalJoiningBlockType().contains(faceBlock.getType())) continue;
                 return faceBlock;
             }
         }
@@ -117,6 +117,12 @@ public class Util {
         }
 
         return null;
+    }
+
+    public static Collection<Material> getHorizontalJoiningBlockType() {
+        Collection<Material> list = new ArrayList<>();
+        list.add(Material.CHEST); list.add(Material.TRAPPED_CHEST);
+        return list;
     }
 
 }
