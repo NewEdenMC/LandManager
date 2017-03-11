@@ -11,6 +11,9 @@ protections:
    blocks:
       chest:
          auto_protect: true
+      wooden_door:
+         auto_protect: false
+         dependant_on: below
 
 land_claims:
    restricted_worlds_mode: whitelist

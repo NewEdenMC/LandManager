@@ -4,19 +4,14 @@ import co.neweden.LandManager.Exceptions.ProtectionAlreadyExistsException;
 import co.neweden.LandManager.Exceptions.RestrictedWorldException;
 import org.bukkit.*;
 import org.bukkit.block.*;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.sql.*;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -24,9 +19,32 @@ import java.util.stream.Collectors;
 public class Protections implements Listener {
 
     protected List<BlockProtection> blockProtections = new CopyOnWriteArrayList<>();
+    protected Map<Material, DependencyDirections> dependencies = new HashMap<>();
+
+    protected enum DependencyDirections { ABOVE, BELOW, HORIZONTAL, ALL }
 
     public Protections() {
         Bukkit.getPluginManager().registerEvents(this, LandManager.getPlugin());
+        ConfigurationSection cs = LandManager.getPlugin().getConfig().getConfigurationSection("protections.blocks");
+        if (cs == null) return;
+        cs.getKeys(false).stream()
+            .filter(e -> cs.isSet(e + ".dependant_on"))
+            .forEach(e -> {
+                Material key; DependencyDirections value;
+                try {
+                    key = Material.valueOf(e.toUpperCase());
+                } catch (IllegalArgumentException ex) {
+                    LandManager.getPlugin().getLogger().log(Level.WARNING, "While scanning Config for Block Dependencies, found block type \"" + e + "\" but it is not a valid material.");
+                    return;
+                }
+                try {
+                     value = DependencyDirections.valueOf(cs.getString(e + ".dependant_on").toUpperCase());
+                } catch (IllegalArgumentException ex) {
+                    LandManager.getPlugin().getLogger().log(Level.WARNING, "While scanning Config for Block Dependencies, the dependant_on value for \"" + e + "\" is not valid, valid values are: ABOVE, BELOW, HORIZONTAL, ALL");
+                    return;
+                }
+                dependencies.put(key, value);
+            });
     }
 
     public boolean isWorldRestricted(World world) { return LandManager.isWorldRestricted("protections", world); }
@@ -132,6 +150,26 @@ public class Protections implements Listener {
             LandManager.getPlugin().getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to create a new Protection.", e);
             return null;
         }
+    }
+
+    public Collection<Protection> getDependentProtections(Block block) {
+        Collection<Protection> dependents = new HashSet<>();
+        for (BlockFace face : new BlockFace[]{BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST}) {
+            // Loop round each of the block faces we want to check getting the block associated with that face,
+            // checking to make sure that block is a block that can be a dependent
+            Block relative = block.getRelative(face);
+            if (!dependencies.containsKey(relative.getType())) continue;
+            // Get the Protection associated with that block, if no valid protection skip this face
+            Protection relativeProtection = get(relative);
+            if (relativeProtection == null) continue;
+            switch (dependencies.get(relative.getType())) {
+                case BELOW: if (!face.equals(BlockFace.UP)) continue;
+                case ABOVE: if (!face.equals(BlockFace.DOWN)) continue;
+                case HORIZONTAL: if (!face.equals(BlockFace.NORTH) && !face.equals(BlockFace.EAST) && !face.equals(BlockFace.SOUTH) && !face.equals(BlockFace.WEST)) continue;
+            }
+            dependents.add(relativeProtection);
+        }
+        return dependents;
     }
 
     public boolean delete(Protection protection) {
