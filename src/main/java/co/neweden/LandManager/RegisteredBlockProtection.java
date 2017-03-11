@@ -6,11 +6,11 @@ import org.bukkit.block.Block;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class BlockProtection extends Protection {
+public class RegisteredBlockProtection extends RegisteredProtection {
 
     protected Block block;
 
-    public BlockProtection(int id) { super(id); }
+    public RegisteredBlockProtection(int id) { super(id); }
 
     public ACL getParentACL() { return getParent(); }
 
@@ -24,7 +24,7 @@ public class BlockProtection extends Protection {
         if (LandManager.protections().isWorldRestricted(block.getWorld()))
             throw new RestrictedWorldException(block.getWorld(), "Cannot change the World of protection #" + getID() + " to World " + block.getWorld().getName() + " as this world is restricted.", "Cannot change the world of this protection as the new world is restricted.");
 
-        BlockProtection to = LandManager.protections().get(block);
+        RegisteredBlockProtection to = LandManager.protections().get(block);
         if (to != null && !equals(to))
             return false; // prevent this protection from being set to a block which is already protected but has a different protection
 

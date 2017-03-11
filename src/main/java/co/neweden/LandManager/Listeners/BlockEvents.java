@@ -4,11 +4,8 @@ import co.neweden.LandManager.*;
 import co.neweden.LandManager.Exceptions.RestrictedWorldException;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -19,10 +16,8 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.world.StructureGrowEvent;
-import org.bukkit.material.Door;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -46,7 +41,7 @@ public class BlockEvents implements Listener {
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onBlockFromToUpdate(BlockFromToEvent event) {
-        BlockProtection p = LandManager.protections().get(event.getBlock());
+        RegisteredBlockProtection p = LandManager.protections().get(event.getBlock());
         if (p == null || event.getBlock().isLiquid()) return;
 
         try {
@@ -73,7 +68,7 @@ public class BlockEvents implements Listener {
             int count = 0;
             for (ACL e : found) {
                 String bperm = "";
-                if (e instanceof Protection) bperm = "landmanager.protection.interactany";
+                if (e instanceof RegisteredProtection) bperm = "landmanager.protection.interactany";
                 if (e instanceof LandClaim) bperm = "landmanager.land.interactany";
                 if (e.testAccessLevel(trigger, ACL.Level.INTERACT, bperm)) count++;
             }
@@ -85,7 +80,7 @@ public class BlockEvents implements Listener {
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent event) {
-        Protection p = LandManager.protections().get(event.getBlock());
+        RegisteredProtection p = LandManager.protections().get(event.getBlock());
         if (p == null) return;
 
         if (!p.testAccessLevel(event.getPlayer(), ACL.Level.FULL_ACCESS, "landmanager.unlock.any")) {
@@ -106,10 +101,10 @@ public class BlockEvents implements Listener {
      For protections associated with multiple blocks, returns true if removal of the protection should be stopped,
      false if it should continue
      */
-    private boolean processUpdateForMultiBlockProtection(Player player, Block block, Protection p) {
+    private boolean processUpdateForMultiBlockProtection(Player player, Block block, RegisteredProtection p) {
         // must be a chest and must be a block protection to swap protection block, otherwise removal should continue
-        if (!Util.getHorizontalJoiningBlockType().contains(block.getType()) || !(p instanceof BlockProtection)) return false;
-        BlockProtection bp = (BlockProtection) p;
+        if (!Util.getHorizontalJoiningBlockType().contains(block.getType()) || !(p instanceof RegisteredBlockProtection)) return false;
+        RegisteredBlockProtection bp = (RegisteredBlockProtection) p;
         // If the block relating to the protection is different from the one being broken we don't need to do anything
         // e.g. if the left side of a double chest is being broken but the right side holds the protection, breaking
         // the left side effects nothing, return true to prevent the protection being removed

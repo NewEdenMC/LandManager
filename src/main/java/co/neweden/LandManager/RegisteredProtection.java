@@ -5,13 +5,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-public abstract class Protection extends ACL {
+public abstract class RegisteredProtection extends ACL {
 
     private int id;
     protected UUID owner;
     protected Level everyoneAccessLevel;
 
-    public Protection(int id) {
+    public RegisteredProtection(int id) {
         this.id = id;
         loadACL();
     }

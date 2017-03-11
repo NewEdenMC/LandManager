@@ -90,7 +90,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
             if (end)
                 return; // to prevent the below code from executing after any of the above commands have executed
 
-            Protection protection = LandManager.protections().get(event.getClickedBlock());
+            RegisteredProtection protection = LandManager.protections().get(event.getClickedBlock());
 
             if (protection == null)
                 throw new CommandException("&cThis " + event.getClickedBlock().getType().toString().toLowerCase() + " is not registered therefor you can't use this command on it.");
@@ -133,7 +133,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         player.sendMessage(Util.formatString("&aProtection has been created."));
     }
 
-    private void unlockCommand(Player player, Protection protection) {
+    private void unlockCommand(Player player, RegisteredProtection protection) {
         if (!protection.testAccessLevel(player, ACL.Level.FULL_ACCESS, "landmanager.unlock.any"))
             throw new CommandException("&cYou do not have permission to remove this protection.");
 
@@ -152,7 +152,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         if (!acl.testAccessLevel(player, ACL.Level.VIEW, "landmanager.pinfo.any"))
             throw new CommandException("&cThis is protected but you do not have permission to view the protection Info.");
 
-        if (acl instanceof Protection) {
+        if (acl instanceof RegisteredProtection) {
             status = "&aProtected";
             owner = Bukkit.getOfflinePlayer(acl.getOwner()).getName();
         } else if (acl instanceof FallbackACL)
@@ -169,7 +169,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         ));
     }
 
-    private void transferCommand(Protection protection, Player player, String[] args) {
+    private void transferCommand(RegisteredProtection protection, Player player, String[] args) {
         if (!protection.testAccessLevel(player, ACL.Level.FULL_ACCESS, "landmanager.ptransfer.any"))
             throw new CommandException("&cYou do not have permission to transfer this Protection to another player.");
 

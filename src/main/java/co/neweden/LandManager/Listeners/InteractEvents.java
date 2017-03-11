@@ -20,9 +20,6 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.InventoryHolder;
 
-import java.util.Collection;
-import java.util.HashSet;
-
 public class InteractEvents implements Listener {
 
     public InteractEvents() {
@@ -42,7 +39,7 @@ public class InteractEvents implements Listener {
 
         String bperm = "";
         String typeName = "";
-        if (acl instanceof Protection) {
+        if (acl instanceof RegisteredProtection) {
             bperm = "landmanager.protection." + bypassPermSuffix;
             typeName = "Protection";
         }

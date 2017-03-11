@@ -1,20 +1,20 @@
 package co.neweden.LandManager.Exceptions;
 
-import co.neweden.LandManager.Protection;
+import co.neweden.LandManager.RegisteredProtection;
 
 public class ProtectionAlreadyExistsException extends UserException {
 
-    private Protection protection;
+    private RegisteredProtection protection;
 
-    public ProtectionAlreadyExistsException(Protection protection, String consoleMessage, String userMessage) {
+    public ProtectionAlreadyExistsException(RegisteredProtection protection, String consoleMessage, String userMessage) {
         super(consoleMessage, userMessage);
         this.protection = protection;
     }
 
-    public ProtectionAlreadyExistsException(Protection protection, String message) { this(protection, message, message); }
+    public ProtectionAlreadyExistsException(RegisteredProtection protection, String message) { this(protection, message, message); }
 
     public ProtectionAlreadyExistsException(ProtectionAlreadyExistsException cause) { super(cause); }
 
-    public Protection getProtection() { return protection; }
+    public RegisteredProtection getProtection() { return protection; }
 
 }

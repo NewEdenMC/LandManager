@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class Protections implements Listener {
 
-    protected List<BlockProtection> blockProtections = new CopyOnWriteArrayList<>();
+    protected List<RegisteredBlockProtection> blockProtections = new CopyOnWriteArrayList<>();
     protected Map<Material, DependencyDirections> dependencies = new HashMap<>();
 
     protected enum DependencyDirections { ABOVE, BELOW, HORIZONTAL, ALL }
@@ -49,14 +49,14 @@ public class Protections implements Listener {
 
     public boolean isWorldRestricted(World world) { return LandManager.isWorldRestricted("protections", world); }
 
-    public BlockProtection get(Block block) {
+    public RegisteredBlockProtection get(Block block) {
         // Setup b1 and b2, in general b1 and b2 will be the same except where "block" is e.g. a Chest or Door
         final Block b1 = block;
         Block joining = Util.getJoiningBlock(block);
         final Block b2 = (joining != null) ? joining : block;
 
         // Search currently loaded protections to see if protection for "block" is already loaded, if so return it
-        Optional<BlockProtection> bpOption = blockProtections.stream()
+        Optional<RegisteredBlockProtection> bpOption = blockProtections.stream()
                 .filter(p -> p.getBlock().equals(b1) || p.getBlock().equals(b2)).findFirst();
         if (bpOption.isPresent())
             return bpOption.get();
@@ -73,7 +73,7 @@ public class Protections implements Listener {
 
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                BlockProtection p = generate(rs);
+                RegisteredBlockProtection p = generate(rs);
                 if (p == null) return null; // If an error occurred while generating, skip this one, console output already sent
                 blockProtections.add(p);
                 return p;
@@ -86,8 +86,8 @@ public class Protections implements Listener {
         return null;
     }
 
-    private BlockProtection generate(ResultSet rs) throws SQLException {
-        BlockProtection p = new BlockProtection(rs.getInt("protection_id"));
+    private RegisteredBlockProtection generate(ResultSet rs) throws SQLException {
+        RegisteredBlockProtection p = new RegisteredBlockProtection(rs.getInt("protection_id"));
 
         try {
             p.owner = UUID.fromString(rs.getString("owner"));
@@ -113,20 +113,20 @@ public class Protections implements Listener {
     }
 
     public ACL getACL(Block block) {
-        Protection p = get(block);
+        RegisteredProtection p = get(block);
         if (p != null)
             return p;
         else
             return new FallbackACL(LandManager.getLandClaim(block.getChunk()));
     }
 
-    public BlockProtection create(UUID owner, Block block) throws RestrictedWorldException, ProtectionAlreadyExistsException {
+    public RegisteredBlockProtection create(UUID owner, Block block) throws RestrictedWorldException, ProtectionAlreadyExistsException {
         if (isWorldRestricted(block.getWorld()))
             throw new RestrictedWorldException(block.getWorld(), "Unable to create Protection in this World as it is restricted by the configuration.", "You are not allowed to create a protection in this world.");
 
         ACL current = LandManager.protections.getACL(block);
-        if (current instanceof Protection)
-            throw new ProtectionAlreadyExistsException((Protection) current, "Unable to create Protection as a Protection already exists for the Block at the Location: x=" + block.getX() + " y=" + block.getType() + " z=" + block.getZ(), "Cannot protect this block as it is already protected.");
+        if (current instanceof RegisteredProtection)
+            throw new ProtectionAlreadyExistsException((RegisteredProtection) current, "Unable to create Protection as a Protection already exists for the Block at the Location: x=" + block.getX() + " y=" + block.getType() + " z=" + block.getZ(), "Cannot protect this block as it is already protected.");
 
         try {
             PreparedStatement st = LandManager.getDB().prepareStatement("INSERT INTO `protections` (`world`, `x`, `y`, `z`, `owner`) VALUES (?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
@@ -140,7 +140,7 @@ public class Protections implements Listener {
             rs.next();
 
             int pID = rs.getInt(1);
-            BlockProtection p = new BlockProtection(pID);
+            RegisteredBlockProtection p = new RegisteredBlockProtection(pID);
             p.owner = owner;
             p.block = block;
             blockProtections.add(p);
@@ -152,15 +152,15 @@ public class Protections implements Listener {
         }
     }
 
-    public Collection<Protection> getDependentProtections(Block block) {
-        Collection<Protection> dependents = new HashSet<>();
+    public Collection<RegisteredProtection> getDependentProtections(Block block) {
+        Collection<RegisteredProtection> dependents = new HashSet<>();
         for (BlockFace face : new BlockFace[]{BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST}) {
             // Loop round each of the block faces we want to check getting the block associated with that face,
             // checking to make sure that block is a block that can be a dependent
             Block relative = block.getRelative(face);
             if (!dependencies.containsKey(relative.getType())) continue;
             // Get the Protection associated with that block, if no valid protection skip this face
-            Protection relativeProtection = get(relative);
+            RegisteredProtection relativeProtection = get(relative);
             if (relativeProtection == null) continue;
             switch (dependencies.get(relative.getType())) {
                 case BELOW: if (!face.equals(BlockFace.UP)) continue;
@@ -172,7 +172,7 @@ public class Protections implements Listener {
         return dependents;
     }
 
-    public boolean delete(Protection protection) {
+    public boolean delete(RegisteredProtection protection) {
         try {
             blockProtections.removeIf(p -> p.equals(protection));
 
@@ -203,7 +203,7 @@ public class Protections implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onChunkUnload(ChunkUnloadEvent event) {
-        Collection<BlockProtection> bp = blockProtections.stream()
+        Collection<RegisteredBlockProtection> bp = blockProtections.stream()
                 .filter(e -> e.getBlock().getChunk().equals(event.getChunk()))
                 .collect(Collectors.toList());
         blockProtections.removeAll(bp);
