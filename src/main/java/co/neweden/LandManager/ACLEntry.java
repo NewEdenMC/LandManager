@@ -14,7 +14,20 @@ public class ACLEntry implements Comparable<ACLEntry> {
 
     @Override
     public int compareTo(ACLEntry another) {
-        return another.level.compareTo(level);
+        // ACLs should be ordered by Level then UUID
+        // First we compare the level and return, returning -1 or 1 if they are different, if the Level matches we
+        // continue on to compare based on UUID
+        int levelVal = another.level.compareTo(this.level);
+        if (levelVal != 0) return levelVal;
+
+        // UUIDs could be null, if both are null return 0 as they are the same
+        if (uuid == null && another.uuid == null) return 0;
+        // if one is null but not the other return either 1 or -1
+        if (uuid == null) return 1;
+        if (another.uuid == null) return -1;
+
+        // if both are not nul compare both UUIDs and return
+        return uuid.compareTo(another.uuid);
     }
 
     @Override
