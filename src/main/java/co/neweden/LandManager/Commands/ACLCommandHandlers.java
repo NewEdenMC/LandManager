@@ -63,7 +63,7 @@ public class ACLCommandHandlers {
         if (addPlayer == null)
             throw new CommandException("&cPlayer \"" + args[1] + "\" not found.");
 
-        ACL.Level level = ACL.Level.MODIFY;
+        ACL.Level level = ACL.Level.INTERACT;
         if (args.length >= 3) {
             level = ACL.Level.valueOf(args[2].toUpperCase());
             if (level.equals(ACL.Level.FULL_ACCESS))
