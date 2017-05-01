@@ -18,6 +18,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -52,14 +53,16 @@ public class BlockEvents implements Listener {
         }
     }
 
-    private void handleCheckBlocks(Cancellable event, Collection<Block> blocks) { handleCheckBlocks(event, blocks, null);}
+    // called on block/entity explode and piston extend/retract
+    private void handleCheckBlocks(Cancellable event, Collection<Block> blocks) { handleCheckBlocks(event, blocks, null); }
+    // called on block multi-place and structure grow (trees)
     private void handleCheckBlocks(Cancellable event, Collection<Block> blocks, Player trigger) {
-        Collection<ACL> found = blocks.stream()
+        List<ACL> found = blocks.stream()
                 .map(Block::getChunk).map(LandManager::getLandClaim)
-                .filter(Objects::nonNull).collect(Collectors.toSet());
+                .filter(Objects::nonNull).collect(Collectors.toList());
         found.addAll(blocks.stream()
                 .map(LandManager.protections()::get)
-                .filter(Objects::nonNull).collect(Collectors.toSet()));
+                .filter(Objects::nonNull).collect(Collectors.toList()));
 
         if (found.size() < 1) return; // we use Set.size() instead of the Lambda count() as we can take advantage of Sets ability to group/override duplicate values for us
         if (trigger != null) {
@@ -74,7 +77,22 @@ public class BlockEvents implements Listener {
             }
             if (count == found.size()) return;
             trigger.sendMessage(Util.formatString("&cIt is not possible to perform this action, you are either to close to a Land border or this will effect a protection that you do not have access to."));
+            event.setCancelled(true);
+            return;
         }
+
+        if (event instanceof BlockPistonEvent) {
+            BlockPistonEvent pistonEvent = (BlockPistonEvent) event;
+
+            ACL source = LandManager.getLandClaim(pistonEvent.getBlock().getChunk());
+            if (source == null)
+                LandManager.protections().get(pistonEvent.getBlock());
+
+            if (found.get(0).equals(source)) return;
+            event.setCancelled(true);
+            return;
+        }
+
         event.setCancelled(true);
     }
 
