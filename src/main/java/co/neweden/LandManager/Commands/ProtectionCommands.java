@@ -45,7 +45,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         Player player = (Player) sender;
         if (handlePersist(command, player)) return true; // we are done if the player ran the persist command
         cmdCache.put(player, new CommandCache(command.getName(), args, System.currentTimeMillis()));
-        sender.sendMessage(Util.formatString("&bThe command is ready, &eleft click&b a block to run this command!"));
+        sender.sendMessage(Util.formatString("&bThe command is ready, &eright click&b a block to run this command!"));
 
         return true;
     }
@@ -69,7 +69,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (!event.getAction().equals(Action.LEFT_CLICK_BLOCK) ||
+        if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK) ||
                 !cmdCache.containsKey(player)) return;
 
         event.setCancelled(true);
