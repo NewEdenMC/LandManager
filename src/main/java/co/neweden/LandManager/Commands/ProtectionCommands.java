@@ -155,7 +155,7 @@ public class ProtectionCommands implements CommandExecutor, Listener {
         if (acl instanceof RegisteredProtection) {
             status = "&aProtected";
             owner = Bukkit.getOfflinePlayer(acl.getOwner()).getName();
-        } else if (acl instanceof FallbackACL)
+        } else if (LandManager.getLandClaim(block.getChunk()) != null)
             status = "&eNot registered, inherited from Land Claim";
 
         if (!LandManager.protections().canBlockBeProtected(block.getType()))
