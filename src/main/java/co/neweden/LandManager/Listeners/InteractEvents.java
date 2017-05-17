@@ -70,6 +70,7 @@ public class InteractEvents implements Listener {
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onVehicleEnter(VehicleEnterEvent event) {
+        if (!(event.getEntered() instanceof Player)) return; // temp fix for potential server crash with Endermite trying to enter Minecart on chunk load
         handleEvent(event.getVehicle().getLocation(), event, event.getEntered());
     }
 
