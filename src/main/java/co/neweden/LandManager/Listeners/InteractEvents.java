@@ -30,12 +30,11 @@ public class InteractEvents implements Listener {
         handleEvent(targetLocation, event, callingEntity, ACL.Level.INTERACT, "interactany");
     }
     private void handleEvent(Location targetLocation, Cancellable event, Entity callingEntity, ACL.Level needed, String bypassPermSuffix) {
-        ACL acl = LandManager.protections().getACL(targetLocation.getBlock());
-
         if (callingEntity == null) return; // callingEntity may sometimes be null
-
         if (!(callingEntity instanceof Player)) return;
+
         Player player = (Player) callingEntity;
+        ACL acl = LandManager.protections().getACL(targetLocation.getBlock());
 
         String bperm = "";
         String typeName = "";
@@ -70,7 +69,6 @@ public class InteractEvents implements Listener {
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onVehicleEnter(VehicleEnterEvent event) {
-        if (!(event.getEntered() instanceof Player)) return; // temp fix for potential server crash with Endermite trying to enter Minecart on chunk load
         handleEvent(event.getVehicle().getLocation(), event, event.getEntered());
     }
 
