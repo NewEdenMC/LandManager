@@ -272,7 +272,7 @@ public class LandCommands implements CommandExecutor {
     }
 
     private void setIconCommand(LandClaim land, Player player, String[] args) {
-        if (!land.testAccessLevel(player, ACL.Level.MODIFY, "landmanager.licon.any"))
+        if (!land.testAccessLevel(player, ACL.Level.MODIFY, "landmanager.lseticon.any"))
             throw new CommandException("&cYou do not have permission to set the icon for this Land.");
 
         if (args.length == 0) {
