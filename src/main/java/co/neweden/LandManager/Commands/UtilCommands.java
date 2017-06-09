@@ -85,9 +85,11 @@ public class UtilCommands implements CommandExecutor {
         int passes = 0;
         while (passes < passLimit) { // We don't want this running indefinitely
             if (worldRadius == -1) {
-                x = rand.nextInt(); z = rand.nextInt();
+                x = rand.nextInt(); x = x - (x / 2);
+                z = rand.nextInt(); z = z - (z / 2);
             } else {
-                x = rand.nextInt(worldRadius); z = rand.nextInt(worldRadius);
+                x = rand.nextInt(worldRadius * 2) - worldRadius;
+                z = rand.nextInt(worldRadius * 2) - worldRadius;
             }
             Location loc = new Location(player.getWorld(), x, player.getWorld().getHighestBlockYAt(x, z), z);
             Material belowBlock = new Location(loc.getWorld(), loc.getX(), loc.getY() - 1, loc.getZ()).getBlock().getType();
