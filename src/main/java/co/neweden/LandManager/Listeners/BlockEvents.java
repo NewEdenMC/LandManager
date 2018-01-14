@@ -3,9 +3,11 @@ package co.neweden.LandManager.Listeners;
 import co.neweden.LandManager.*;
 import co.neweden.LandManager.Exceptions.RestrictedWorldException;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -18,8 +20,8 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class BlockEvents implements Listener {
@@ -57,42 +59,71 @@ public class BlockEvents implements Listener {
     private void handleCheckBlocks(Cancellable event, Collection<Block> blocks) { handleCheckBlocks(event, blocks, null); }
     // called on block multi-place and structure grow (trees)
     private void handleCheckBlocks(Cancellable event, Collection<Block> blocks, Player trigger) {
-        List<ACL> found = blocks.stream()
-                .map(Block::getChunk).map(LandManager::getLandClaim)
-                .filter(Objects::nonNull).collect(Collectors.toList());
-        found.addAll(blocks.stream()
+        Set<RegisteredProtection> pFound = blocks.stream()
                 .map(LandManager.protections()::get)
-                .filter(Objects::nonNull).collect(Collectors.toList()));
+                .filter(Objects::nonNull).collect(Collectors.toSet());
 
-        if (found.size() < 1) return; // we use Set.size() instead of the Lambda count() as we can take advantage of Sets ability to group/override duplicate values for us
+        if (pFound.size() > 0) {
+            // If a block or entity are registered we should not effect it in any way so cancel this action
+            event.setCancelled(true);
+            if (trigger != null)
+                trigger.sendMessage(Util.formatString("&cThe action you just performed couldn't not be completed as it would have effected at least one nearby Protected Blocks or Entities."));
+            return;
+        }
+
+        // Now we now the effected blocks contain no protections, search for any Land Claims.
+        // The resulting Set will also include null if there are any chunks that will be effected which don't have
+        // any Land Claims
+        Set<LandClaim> landFound = blocks.stream()
+                .map(Block::getChunk).map(LandManager::getLandClaim)
+                .collect(Collectors.toSet());
+
+        boolean hasNull = false;
+        if (landFound.contains(null)) {
+            hasNull = true;
+            landFound.remove(null);
+        }
+
+        if (landFound.size() < 1)
+            return; // we use Set.size() instead of the Lambda count() as we can take advantage of Sets ability to group/override duplicate values for us
+
         if (trigger != null) {
             // if the event we are checking was triggered by a player we have the opportunity to check if the player is
             // allowed to perform any actions to the effected blocks
             int count = 0;
-            for (ACL e : found) {
-                String bperm = "";
-                if (e instanceof RegisteredProtection) bperm = "landmanager.protection.interactany";
-                if (e instanceof LandClaim) bperm = "landmanager.land.interactany";
-                if (e.testAccessLevel(trigger, ACL.Level.INTERACT, bperm)) count++;
+            for (LandClaim e : landFound) {
+                if (e.testAccessLevel(trigger, ACL.Level.INTERACT, "landmanager.land.interactany")) count++;
             }
-            if (count == found.size()) return;
-            trigger.sendMessage(Util.formatString("&cIt is not possible to perform this action, you are either to close to a Land border or this will effect a protection that you do not have access to."));
+            if (count == landFound.size()) return;
+            trigger.sendMessage(Util.formatString("&cThe action you just performed would effect at least one nearby Land Claim and you do not have the Access Level INTERACT on all effected Land Claims."));
             event.setCancelled(true);
             return;
         }
 
         if (event instanceof BlockPistonEvent) {
             BlockPistonEvent pistonEvent = (BlockPistonEvent) event;
-
-            ACL source = LandManager.getLandClaim(pistonEvent.getBlock().getChunk());
-            if (source == null)
-                LandManager.protections().get(pistonEvent.getBlock());
-
-            if (found.get(0).equals(source)) return;
-            event.setCancelled(true);
+            handleLandBorderCheck(pistonEvent.getBlock().getChunk(), landFound, event);
             return;
         }
 
+        if (event instanceof EntityExplodeEvent) {
+            // We should allow TNT to explode in a Land Claim
+            EntityExplodeEvent entityEvent = (EntityExplodeEvent) event;
+            if (entityEvent.getEntityType() == EntityType.PRIMED_TNT) {
+                handleLandBorderCheck(entityEvent.getLocation().getChunk(), landFound, event);
+                return;
+            }
+        }
+
+        event.setCancelled(true);
+    }
+
+    private void handleLandBorderCheck(Chunk source, Set<LandClaim> landFound, Cancellable event) {
+        // Get the Land Claim of the chunk the event was triggered in
+        LandClaim sourceLand = LandManager.getLandClaim(source);
+        // Don't cancel the event if the the source and effected blocks are on the same Land Claim
+        // In other words the event should not cancel if only one Land Claim was found
+        if (landFound.iterator().next().equals(sourceLand) && landFound.size() == 1) return;
         event.setCancelled(true);
     }
 
