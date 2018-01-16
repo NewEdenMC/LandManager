@@ -8,21 +8,31 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 
 public class UtilCommands implements CommandExecutor {
 
-    Set<Material> rtpBlocksBlacklist = new HashSet<>();
+    private Set<Material> rtpBlocksBlacklist = new HashSet<>();
+    private int rtpDefRadius;
+    private Map<String, Integer> rtpWorldRadius = new HashMap<>();
+    private int rtpPassLimit;
 
     public UtilCommands() {
         LandManager.getPlugin().getCommand("landmanager").setExecutor(this);
         LandManager.getPlugin().getCommand("rtp").setExecutor(this);
+
+        rtpDefRadius = LandManager.getPlugin().getConfig().getInt("random_tp.default_radius", -1);
+        rtpPassLimit = LandManager.getPlugin().getConfig().getInt("random_tp.pass_limit", 100);
+
+        rtpWorldRadius.clear();
+        ConfigurationSection rtpConfigWorldRadius = LandManager.getPlugin().getConfig().getConfigurationSection("random_tp.worlds.");
+        for (String key : rtpConfigWorldRadius.getKeys(false)) {
+            rtpWorldRadius.put(key, rtpConfigWorldRadius.getInt(key));
+        }
 
         rtpBlocksBlacklist.clear();
         List<String> rtpConfigBlocksBlacklist = LandManager.getPlugin().getConfig().getStringList("random_tp.blocks_blacklist");
@@ -91,15 +101,13 @@ public class UtilCommands implements CommandExecutor {
     }
 
     private void rtpCommand(Player player) {
-        int defRadius = LandManager.getPlugin().getConfig().getInt("random_tp.default_radius", -1);
-        int worldRadius = LandManager.getPlugin().getConfig().getInt("random_tp.worlds." + player.getWorld().getName(), defRadius);
-        int passLimit = LandManager.getPlugin().getConfig().getInt("random_tp.pass_limit", 100);
+        Integer worldRadius = rtpWorldRadius.get(player.getWorld().getName());
+        if (worldRadius == null) worldRadius = rtpDefRadius;
         int x; int z;
         Random rand = new Random();
         player.sendMessage(Util.formatString("&eTeleporting..."));
 
-        int passes = 0;
-        while (passes < passLimit) { // We don't want this running indefinitely
+        for (int passes = 0; passes < rtpPassLimit; passes++) { // We don't want this running indefinitely
             if (worldRadius == -1) {
                 x = rand.nextInt(); x = x - (x / 2);
                 z = rand.nextInt(); z = z - (z / 2);
@@ -113,10 +121,9 @@ public class UtilCommands implements CommandExecutor {
             if (!rtpBlocksBlacklist.contains(belowBlock) && LandManager.getLandClaim(loc.getChunk()) == null) {
                 player.teleport(loc.add(0, 1, 0));
                 return;
-            } else
-                passes++;
+            }
         }
-        player.sendMessage(Util.formatString("&cTried to teleport you to a random location that isn't on water, lava or a land claim but after trying " + passLimit + " I was unable to find a location to send you to, contact a staff member who can help you find some empty land, please also report this issue."));
+        player.sendMessage(Util.formatString("&cTried to teleport you to a random location that isn't on a Blacklisted Block nor a Land Claim but after trying " + rtpPassLimit + " times I was unable to find a suitable location to send you to, contact a staff member who can help you find some empty land, please also report this issue."));
     }
 
 }
