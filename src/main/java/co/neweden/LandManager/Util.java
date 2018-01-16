@@ -152,16 +152,20 @@ public class Util {
         Location use = null;
 
         for (int i = current.getBlockY(); i <= to; i++) {
-            if (!below.getBlock().getType().equals(Material.AIR) &&
-                current.getBlock().getType().equals(Material.AIR) &&
-                above.getBlock().getType().equals(Material.AIR))
+            Material belowB = below.getBlock().getType();
+            Material currentB = current.getBlock().getType();
+            Material aboveB = above.getBlock().getType();
+
+            if (belowB.isSolid() && !currentB.isSolid() && !aboveB.isSolid())
                 use = current.clone();
+
             // increment each location for next pass
             below.add(0, 1, 0);
             current.add(0, 1, 0);
             above.add(0, 1, 0);
         }
 
+        if (use != null) use.add(0.5, 0, 0.5); // put player in the centre of the block, avoids damage by being half in a wall
         return use;
     }
 

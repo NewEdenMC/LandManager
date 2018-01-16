@@ -116,10 +116,14 @@ public class UtilCommands implements CommandExecutor {
                 z = rand.nextInt(worldRadius * 2) - worldRadius;
             }
             Location loc = Util.getHighestAirBlockAt(player.getWorld(), x, z);
-            if (loc == null) continue;
-            Material belowBlock = loc.subtract(0, 1, 0).getBlock().getType();
-            if (!rtpBlocksBlacklist.contains(belowBlock) && LandManager.getLandClaim(loc.getChunk()) == null) {
-                player.teleport(loc.add(0, 1, 0));
+            if (loc == null || LandManager.getLandClaim(loc.getChunk()) != null) continue;
+
+            Material belowB = loc.subtract(0, 1, 0).getBlock().getType();
+            Material feetB = loc.add(0, 1, 0).getBlock().getType();
+            Material headB = loc.add(0, 1, 0).getBlock().getType();
+
+            if (!rtpBlocksBlacklist.contains(belowB) && !rtpBlocksBlacklist.contains(feetB) && !rtpBlocksBlacklist.contains(headB)) {
+                player.teleport(loc.subtract(0, 1, 0));
                 return;
             }
         }
