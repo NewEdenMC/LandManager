@@ -91,8 +91,9 @@ public class UtilCommands implements CommandExecutor {
                 x = rand.nextInt(worldRadius * 2) - worldRadius;
                 z = rand.nextInt(worldRadius * 2) - worldRadius;
             }
-            Location loc = new Location(player.getWorld(), x, player.getWorld().getHighestBlockYAt(x, z), z);
-            Material belowBlock = new Location(loc.getWorld(), loc.getX(), loc.getY() - 1, loc.getZ()).getBlock().getType();
+            Location loc = Util.getHighestAirBlockAt(player.getWorld(), x, z);
+            if (loc == null) continue;
+            Material belowBlock = loc.subtract(0, 1, 0).getBlock().getType();
             if (
                     !belowBlock.equals(Material.WATER) &&
                     !belowBlock.equals(Material.STATIONARY_WATER) &&
@@ -100,7 +101,7 @@ public class UtilCommands implements CommandExecutor {
                     !belowBlock.equals(Material.STATIONARY_LAVA) &&
                     LandManager.getLandClaim(loc.getChunk()) == null)
             {
-                player.teleport(loc);
+                player.teleport(loc.add(0, 1, 0));
                 return;
             } else
                 passes++;

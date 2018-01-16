@@ -125,4 +125,44 @@ public class Util {
         return list;
     }
 
+    public static Location getHighestAirBlockAt(World world, long x, long z) {
+        // We want to do the least amount of iterations, so first we check the Y section where the ground is most
+        // likely to be Y 50 to Y 100
+        Location loc = evalYSection(new Location(world, x, 50, z), 100);
+        if (loc != null) return loc;
+
+        // Next we check below that from Y 0 to Y 49
+        loc = evalYSection(new Location(world, x, 0, z), 49);
+        if (loc != null) return loc;
+
+        // Finally we check the least likely place Y 101 too the world height (probably Y 256) - 1, we limit to 1 block
+        // below the world height because the top block won't have enough room for a player anyway if that is the top
+        // air block
+        loc = evalYSection(new Location(world, x, 101, z), world.getMaxHeight() - 1);
+        if (loc != null) return loc;
+
+        // Return null in the unlikely event this x and z location has no double air blocks
+        return null;
+    }
+
+    private static Location evalYSection(Location start, int to) {
+        Location below = start.clone().subtract(0, 1, 0);
+        Location current = start;
+        Location above = start.clone().add(0, 1, 0);
+        Location use = null;
+
+        for (int i = current.getBlockY(); i <= to; i++) {
+            if (!below.getBlock().getType().equals(Material.AIR) &&
+                current.getBlock().getType().equals(Material.AIR) &&
+                above.getBlock().getType().equals(Material.AIR))
+                use = current.clone();
+            // increment each location for next pass
+            below.add(0, 1, 0);
+            current.add(0, 1, 0);
+            above.add(0, 1, 0);
+        }
+
+        return use;
+    }
+
 }
