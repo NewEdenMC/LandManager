@@ -10,13 +10,29 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.logging.Level;
 
 public class UtilCommands implements CommandExecutor {
+
+    Set<Material> rtpBlocksBlacklist = new HashSet<>();
 
     public UtilCommands() {
         LandManager.getPlugin().getCommand("landmanager").setExecutor(this);
         LandManager.getPlugin().getCommand("rtp").setExecutor(this);
+
+        rtpBlocksBlacklist.clear();
+        List<String> rtpConfigBlocksBlacklist = LandManager.getPlugin().getConfig().getStringList("random_tp.blocks_blacklist");
+        for (String key : rtpConfigBlocksBlacklist) {
+            try {
+                rtpBlocksBlacklist.add(Material.valueOf(key));
+            } catch (IllegalArgumentException e) {
+                LandManager.getPlugin().getLogger().log(Level.WARNING, "Could not add '" + key + "' to Random TP Blocks Blacklist as it is not a valid Block Type, skipping, check 'blocks_blacklist' in 'rtp' section of the config.yml file.");
+            }
+        }
     }
 
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
@@ -94,13 +110,7 @@ public class UtilCommands implements CommandExecutor {
             Location loc = Util.getHighestAirBlockAt(player.getWorld(), x, z);
             if (loc == null) continue;
             Material belowBlock = loc.subtract(0, 1, 0).getBlock().getType();
-            if (
-                    !belowBlock.equals(Material.WATER) &&
-                    !belowBlock.equals(Material.STATIONARY_WATER) &&
-                    !belowBlock.equals(Material.LAVA) &&
-                    !belowBlock.equals(Material.STATIONARY_LAVA) &&
-                    LandManager.getLandClaim(loc.getChunk()) == null)
-            {
+            if (!rtpBlocksBlacklist.contains(belowBlock) && LandManager.getLandClaim(loc.getChunk()) == null) {
                 player.teleport(loc.add(0, 1, 0));
                 return;
             } else

@@ -25,3 +25,4 @@ random_tp:
    worlds:
       melonWorld: 500
    pass_limit: 100
+   blocks_blacklist: [WATER, STATIONARY_WATER, LAVA, STATIONARY_LAVA, FIRE]
